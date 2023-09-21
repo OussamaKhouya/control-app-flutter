@@ -21,7 +21,7 @@ class _HomePageState extends State<Commands> {
     {"numpiece": 2, "client": "Aragon", "date": "40"},
     {"numpiece": 3, "client": "Bob", "date": "5"},
     {"numpiece": 4, "client": "Barbara", "date": "35"},
-  ];
+  ] ;
   //List<Map<String, dynamic>> _allUsers = [];
   List<Commande> _foundUsers = [];
   // This list holds the data for the list view
