@@ -14,62 +14,11 @@ class Commands extends StatefulWidget {
 class _HomePageState extends State<Commands> {
 
 
-  final inputSearch= TextEditingController();
-
-   List<Map<String, dynamic>> _allUsers =[
-    {"numpiece": 1, "client": "Andy", "date": "29"},
-    {"numpiece": 2, "client": "Aragon", "date": "40"},
-    {"numpiece": 3, "client": "Bob", "date": "5"},
-    {"numpiece": 4, "client": "Barbara", "date": "35"},
-  ] ;
-  //List<Map<String, dynamic>> _allUsers = [];
-  List<Commande> _foundUsers = [];
-  // This list holds the data for the list view
-
-  @override
-  initState() {
-
-    super.initState();
-  }
-
-
-  void _runFilter(String enteredKeyword) {
-    List<Commande> results = [];
-    if (enteredKeyword.isEmpty) {
-      // If the search field is empty or only contains white-space, we'll display all users
-      results = commands;
-      print(commands);
-      print(results);
-    } else {
-      results = commands
-          .where((user) =>
-          user.client.toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // We use the toLowerCase() method to make it case-insensitive
-    }
-
-    // Update the _foundUsers list and trigger a rebuild
-    setState(() {
-      _foundUsers = results;
-    });
-    print(commands);
-    print(results);
-  }
-
-   List<Commande> commands=[];
+  List<Commande> commands=[];
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CommandProvider>(context);
     commands = provider.commands;
-    _foundUsers = commands;
-    // _allUsers=commands.map((commande) {
-    //   return{
-    //     "numpiece" : commande.numpiece,
-    //     "client": commande.client,
-    //     "date" : commande.date
-    //   };
-    // }).toList();
-    //  _foundUsers = _allUsers;
 
     return Scaffold(
       appBar: AppBar(
@@ -127,28 +76,28 @@ class _HomePageState extends State<Commands> {
               height: 20,
             ),
             Expanded(
-              child: _foundUsers.isNotEmpty
+              child: _foundCommands.isNotEmpty
                   ? ListView.builder(
-                itemCount: _foundUsers.length,
+                itemCount: _foundCommands.length,
                 itemBuilder: (context, index) => Card(
-                  key: ValueKey(_foundUsers[index].numpiece),
+                  key: ValueKey(_foundCommands[index].numpiece),
                   color: Colors.blue,
                   elevation: 4,
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   child: ListTile(
                     leading: Text(
-                      _foundUsers[index].numpiece.toString(),
+                      _foundCommands[index].numpiece.toString(),
                       style: const TextStyle(fontSize: 16, color:Colors.white,fontWeight: FontWeight.bold),
                     ),
-                    title: Text(_foundUsers[index].client, style:const TextStyle(
+                    title: Text(_foundCommands[index].client, style:const TextStyle(
                         color:Colors.white,fontWeight: FontWeight.bold
                     )),
                     subtitle: Text(
-                        _foundUsers[index].date,style:const TextStyle(
+                        _foundCommands[index].date,style:const TextStyle(
                         color:Colors.white,fontWeight: FontWeight.bold
                     )),
                     trailing: InkWell(child: const Icon(Icons.arrow_forward,color: Colors.white)
-                    ,onTap: (){ Navigator.pushNamed(context, '/detailsCmd', arguments:_foundUsers[index].numpiece ); },
+                    ,onTap: (){ Navigator.pushNamed(context, '/detailsCmd', arguments:_foundCommands[index].numpiece ); },
                     ),
                   ),
                 ),
@@ -165,5 +114,38 @@ class _HomePageState extends State<Commands> {
 
   }
 
+
+  final inputSearch= TextEditingController();
+  List<Commande> _foundCommands = [];
+
+  @override
+  initState() {
+    _foundCommands=commands;
+    super.initState();
+  }
+
+  //Fonction filter qui sert à filtrer data en changant la valeur de l'input search
+  void _runFilter(String enteredKeyword) {
+
+    List<Commande> results = [];
+
+    if (enteredKeyword.isEmpty) {
+      // If the search field is empty or only contains white-space, we'll display all users
+      results = commands;
+    } else {
+      results = commands
+          .where((user) =>
+          user.client.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+      // We use the toLowerCase() method to make it case-insensitive
+    }
+
+    // Update the _foundUsers list and trigger a rebuild
+    setState(() {
+      _foundCommands = results;
+    }
+    );
+
+  }
 
 }
