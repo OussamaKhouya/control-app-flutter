@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_app/providers/auth_provider.dart';
+
+
 class MyDrawer extends StatelessWidget {
 
   final bool popCmd,popAccount;
@@ -56,12 +60,19 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: const Text("Deconexion"),
             onTap: (){
-              Navigator.pushNamed(context, '/login');
+              logout(context);
             },
             leading: const Icon(Icons.logout),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> logout(context) async {
+    final AuthProvider provider =
+    Provider.of<AuthProvider>(context, listen: false);
+
+    await provider.logOut();
   }
 }

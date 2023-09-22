@@ -1,22 +1,22 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app/providers/auth_provider.dart';
 
 import '../models/commande.dart';
 import '../services/api.dart';
 
+class CommandProvider extends ChangeNotifier {
+  List<Commande> commands = [];
+  late ApiService apiService;
+  late AuthProvider authProvider;
 
-class CommandProvider extends ChangeNotifier{
- List<Commande> commands=[];
- late ApiService apiService;
+  CommandProvider(AuthProvider authProvider) {
+    this.authProvider = authProvider;
+    apiService = ApiService(authProvider.token);
+    init();
+  }
 
- CommandProvider(){
-apiService=ApiService();
-init();
- }
-
- Future init() async{
-  commands = await apiService.fetchCommands();
-  notifyListeners();
- }
-
-
+  Future init() async {
+    commands = await apiService.fetchCommands();
+    notifyListeners();
+  }
 }
