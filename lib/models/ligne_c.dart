@@ -1,6 +1,6 @@
 class LigneC {
 
-  String numero;
+  int numero;
   String numpiece;
   String designation;
   double quantite;

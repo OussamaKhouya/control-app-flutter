@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/widgets/drawer.dart';
 import 'package:galleryimage/galleryimage.dart';
 class Gallery extends StatelessWidget {
 
-  final String? designation;
-   Gallery({super.key,required this.designation});
+
+   Gallery({super.key});
 
   List<String> listOfUrls= [
     "https://cosmosmagazine.com/wp-content/uploads/2020/02/191010_nature.jpg",
     "https://scx2.b-cdn.net/gfx/news/hires/2019/2-nature.jpg",
-    "https://cosmosmagazine.com/wp-content/uploads/2020/02/191010_nature.jpg",
   ];
   @override
   Widget build(BuildContext context) {
+    String designation = ModalRoute.of(context)?.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         title:  Text("Pictures d'article: $designation"),
       ),
-      drawer: const MyDrawer(popCmd: false, popAccount: false),
+      //drawer: const MyDrawer(popCmd: false, popAccount: false),
       body:  SafeArea(
         child: SingleChildScrollView(
           child: Padding(

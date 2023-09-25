@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/models/commande.dart';
-import 'package:flutter_app/widgets/drawer.dart';
+import 'package:flutter_app/models/ligne_c.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import '../widgets/data_table.dart';
-
+import '../providers/ligne_commande_provider.dart';
 class DetailsCmd extends StatefulWidget {
-  final String? numpiece;
-  const DetailsCmd({super.key, required this.numpiece});
+
+  const DetailsCmd({super.key});
 
   @override
   State<DetailsCmd> createState() => _DetailsCmdState();
@@ -16,43 +15,7 @@ class DetailsCmd extends StatefulWidget {
 
 class _DetailsCmdState extends State<DetailsCmd> {
 
-  final inputSearch= TextEditingController();
-  final List<Map<String, dynamic>> _allUsers = [
-    {"numpiece": "A0102030104", "designation": "Clavier hp", "quantite": 'quantite : 10'},
-    {"numpiece": "B0102030104", "designation": "Disk dur hdd 1T", "quantite": 'quantite : 3'},
-    {"numpiece": "C0102030104", "designation": "Ecran 15 pouce", "quantite": 'quantite : 2'},
-    {"numpiece": "D0102030104", "designation": "Souris bleutooth ", "quantite": 'quantite : 15'},
-    {"numpiece": "E0102030104", "designation": "Imprimante Lenovo ", "quantite": 'quantite : 1'},
-    {"numpiece": "F0102030104", "designation": "Pc hp folio ", "quantite": 'quantite : 5'},
-    {"numpiece": "G0102030104", "designation": "Disk dur Sdd 500 GO ", "quantite": 'quantite : 2'},
-  ];
-  // This list holds the data for the list view
-  List<Map<String, dynamic>> _foundUsers = [];
 
-  @override
-  initState() {
-
-    _foundUsers = _allUsers;
-    super.initState();
-  }
-  void _runFilter(String enteredKeyword) {
-    List<Map<String, dynamic>> results = [];
-    if (enteredKeyword.isEmpty) {
-      // If the search field is empty or only contains white-space, we'll display all users
-      results = _allUsers;
-    } else {
-      results = _allUsers
-          .where((user) =>
-          user["designation"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // We use the toLowerCase() method to make it case-insensitive
-    }
-
-    // Update the _foundUsers list and trigger a rebuild
-    setState(() {
-      _foundUsers = results;
-    });
-  }
   File? _pickedImage; // Define a variable to store the picked image
 
 
@@ -62,12 +25,14 @@ class _DetailsCmdState extends State<DetailsCmd> {
       _pickedImage = image;
     });
   }
-
+  List<LigneC> LigneCommands=[];
   @override
   Widget build(BuildContext context) {
 
-    final String? numpiece= widget.numpiece;
+    final provider = Provider.of<LigneCProvider>(context);
+    String numpiece = ModalRoute.of(context)?.settings.arguments as String;
 
+    LigneCommands = provider.ligne_commands;
     return Scaffold(
       appBar: AppBar(
         title:  const Text('Détails de Commande'),
@@ -82,49 +47,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
             padding: const EdgeInsets.all(10),
             child: Center(
               child: Column(
-                //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                 // const Text("Information sur le Commande N1", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-               //   const SizedBox(height: 20,),
-                //  const DataTableExample(),
-                 // const SizedBox(height: 20,),
-                 //  Row(
-                 //    mainAxisAlignment: MainAxisAlignment.center,
-                 //    children: [
-                 //      ElevatedButton(
-                 //        onPressed: () async {
-                 //          final image = await _pickImageCamera();
-                 //          if (image != null) {
-                 //            _setPickedImage(image);
-                 //            await _saveImageToDirectory(image);
-                 //          }
-                 //        },
-                 //        child: const Text("Pick Camera"),
-                 //      ),
-                 //      const SizedBox(width: 16),
-                 //      ElevatedButton(
-                 //        onPressed: () async {
-                 //          final image = await _pickImageGallery();
-                 //          if (image != null) {
-                 //            _setPickedImage(image);
-                 //            await _saveImageToDirectory(image);
-                 //          }
-                 //        },
-                 //        child: const Text('Pick Gallery'),
-                 //      ),
-                 //    ],
-                 //  ),
-                 //  const SizedBox(height: 16), // Add spacing between buttons and image
-                 //  _pickedImage != null
-                 //      ? Image.file(
-                 //    _pickedImage!,
-                 //    width: 300,
-                 //    height: 300,
-                 //  )
-                   //   : const Divider(), // Display an empty container if no image is picked
-                // const Divider(
-                //   color: Colors.black,
-                // ),
                   const SizedBox(height: 35,),
                    Text("Liste des Articles de Commande: $numpiece", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                    textAlign: TextAlign.center,
@@ -172,65 +95,144 @@ class _DetailsCmdState extends State<DetailsCmd> {
                     ],
                   ),
                   const SizedBox(height: 15,),
-                   Expanded(
-                      child: _foundUsers.isNotEmpty
-                          ? ListView.builder(
-                        itemCount: _foundUsers.length,
-                        itemBuilder: (context, index) => Card(
-                          key: ValueKey(_foundUsers[index]["numpiece"]),
-                          color: Colors.blue,
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 10,),
-                          child: ListTile(
-                            leading: Text(
-                                "(0)_img / ${_foundUsers[index]["numpiece"]}",
-                              style: const TextStyle(fontSize: 16, color:Colors.white,fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: _foundUsers.isNotEmpty
+                        ? ListView.builder(
+                      itemCount: _foundUsers.length,
+                      itemBuilder: (context, index) => Card(
+                        key: ValueKey(_foundUsers[index].numpiece),
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        child: ListTile(
+                          tileColor: Colors.blue, // Change color to indicate card
+                          contentPadding: const EdgeInsets.all(16), // Add padding for content
+
+                          leading:   CircleAvatar( // Display user image here
+                            backgroundColor: Colors.white,
+                            // child: Text(
+                            //   _foundUsers[index].numpiece, // Replace with user image or initials
+                            //   style: const TextStyle(
+                            //     fontSize: 16,
+                            //     color: Colors.blue, // Text color to match card color
+                            //     fontWeight: FontWeight.bold,
+                            //   ),
+                            // ),
+                            child: InkWell(child: Icon(Icons.edit),
+                            onTap: (){
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) {
+                                  return Container(
+                                    height: MediaQuery.of(context).size.height * 0.5,
+
+                                  );
+
+                                  },
+                              );
+                            },
                             ),
-                            title: Text(_foundUsers[index]['designation'], style: const TextStyle(
-                                color:Colors.white,fontWeight: FontWeight.bold
-                            )),
-                            subtitle: Text(
-                                _foundUsers[index]["quantite"].toString(),style: const TextStyle(
-                                color:Colors.white,fontWeight: FontWeight.bold
-                            )),
-                            trailing:  Row(
-                            mainAxisSize: MainAxisSize.min, // To make the Row as small as possible
+                          ),
+
+                          title:
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${_foundUsers[index].numpiece} (0_pics)',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8,),
+                                Text(
+                                  _foundUsers[index].designation,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          subtitle: Text(
+                            "Quantité: ${_foundUsers[index].quantite}",
+                            style: const TextStyle(
+                              color: Colors.white, // Subtitle color for readability
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15
+                            ),
+                          ),
+
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              InkWell(
-                                child: const Icon(
-                                  Icons.edit,color: Colors.black,size: 20,
+                              // Tooltip(
+                              //   message: 'Edit', // Tooltip for clarity
+                              //   child: InkWell(
+                              //     child: const Icon(
+                              //       Icons.edit,
+                              //       color: Colors.black,
+                              //       size: 20,
+                              //     ),
+                              //     onTap: () {
+                              //       showModalBottomSheet(
+                              //         context: context,
+                              //         isScrollControlled: true,
+                              //         builder: (context) {
+                              //           return Text("Quantité");
+                              //         },
+                              //       );
+                              //     },
+                              //   ),
+                              // ),
+                              Tooltip(
+                                message: 'View Details', // Tooltip for clarity
+                                child: InkWell(
+                                  child: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.white,
+
+                                  ),
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/gallery',
+                                        arguments: _foundUsers[index].designation);
+                                  },
                                 ),
-                                onTap: (){},
-                              ),
-                              InkWell(
-                                child: const Icon(
-                                   Icons.remove_red_eye, color: Colors.black,size: 20,// Replace 'icon1' with the first icon you want
-                                ),
-                                onTap: (){
-                                  Navigator.pushNamed(context, '/gallery',arguments:_foundUsers[index]['designation'] );
-                                },
                               ),
                               const SizedBox(width: 5),
-                              InkWell(
-                                child: const Icon(
-                                  Icons.camera_alt,color: Colors.black,size: 20, // Replace 'icon2' with the second icon you want
+                              Tooltip(
+                                message: 'Capture Image', // Tooltip for clarity
+                                child: InkWell(
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+
+                                  ),
+                                  onTap: () async {
+                                    final image = await _pickImageCamera();
+                                    if (image != null) {
+                                      _setPickedImage(image);
+                                      await _saveImageToDirectory(image);
+                                    }
+                                  },
                                 ),
-                                onTap: () async {
-                                  final image = await _pickImageCamera();
-                                  if (image != null) {
-                                    _setPickedImage(image);
-                                    await _saveImageToDirectory(image);
-                                  }
-                                },
                               ),
                             ],
                           ),
-                          ),
                         ),
-                      ) : const Text('Aucun résultat trouvé', style: TextStyle(fontSize: 24),
-                       )
-                     ,
+                      ),
+                    )
+                        : const Text(
+                      'Aucun résultat trouvé',
+                      style: TextStyle(fontSize: 24),
                     ),
+                  )
+                  ,
 
                 ],
 
@@ -242,6 +244,42 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
     );
   }
+
+  /* Begin Code Filter */
+
+
+  final inputSearch= TextEditingController();
+
+  // This list holds the data for the list view
+  List<LigneC> _foundUsers = [];
+
+  @override
+  initState() {
+
+    _foundUsers = LigneCommands;
+    super.initState();
+  }
+  void _runFilter(String enteredKeyword) {
+    List<LigneC> results = [];
+    if (enteredKeyword.isEmpty) {
+      // If the search field is empty or only contains white-space, we'll display all users
+      results = LigneCommands;
+    } else {
+      results = LigneCommands
+          .where((ligneC) =>
+          ligneC.designation.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+      // We use the toLowerCase() method to make it case-insensitive
+    }
+
+    // Update the _foundUsers list and trigger a rebuild
+    setState(() {
+      _foundUsers = results;
+    });
+  }
+
+
+  /* End Code Filter*/
 
   Future<File?> _pickImageCamera() async {
     final pickedImage =

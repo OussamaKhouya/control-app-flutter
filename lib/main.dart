@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
+import 'package:flutter_app/providers/ligne_commande_provider.dart';
 import 'package:flutter_app/views/commands.dart';
 import 'package:flutter_app/views/compte_view.dart';
 import 'package:flutter_app/views/datails_cmd.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
             providers: [
               ChangeNotifierProvider<CommandProvider>(
                 create: (context) => CommandProvider(authProvider),
+              ),
+              ChangeNotifierProvider<LigneCProvider>(
+                create: (context) => LigneCProvider(authProvider),
               )
             ],
             child: MaterialApp(
@@ -47,12 +51,12 @@ class MyApp extends StatelessWidget {
                 '/account': (context) => const Account(),
                 '/commands' : (context) => const Commands(),
                 '/detailsCmd' : (context) {
-                  String numpiece = ModalRoute.of(context)?.settings.arguments as String;
-                  return DetailsCmd(numpiece: numpiece);
+
+                  return const DetailsCmd();
                 },
                 '/gallery' : (context) {
-                  String designation = ModalRoute.of(context)?.settings.arguments as String;
-                  return Gallery(designation: designation,);
+
+                  return Gallery();
                 },
               },
 

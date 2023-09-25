@@ -134,8 +134,8 @@ class _HomePageState extends State<Commands> {
       results = commands;
     } else {
       results = commands
-          .where((user) =>
-          user.client.toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .where((command) =>
+          command.client.toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // We use the toLowerCase() method to make it case-insensitive
     }

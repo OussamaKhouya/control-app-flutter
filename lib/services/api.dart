@@ -13,7 +13,7 @@ class ApiService {
     this.token = token;
   }
 
-  final String baseurl = "http://192.168.1.10:4300/api";
+  final String baseurl = "http://192.168.1.42:4300/api";
 
   Future<List<Commande>> fetchCommands() async {
     http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
