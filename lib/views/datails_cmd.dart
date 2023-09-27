@@ -96,44 +96,117 @@ class _DetailsCmdState extends State<DetailsCmd> {
                   ),
                   const SizedBox(height: 15,),
                   Expanded(
-                    child: _foundUsers.isNotEmpty
+                    child: _foundLigneCmd.isNotEmpty
                         ? ListView.builder(
-                      itemCount: _foundUsers.length,
+                      itemCount: _foundLigneCmd.length,
                       itemBuilder: (context, index) => Card(
-                        key: ValueKey(_foundUsers[index].numpiece),
+                        shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(10)
+                              )
+                          ),
+                        key: ValueKey(_foundLigneCmd[index].numpiece),
                         elevation: 4,
                         margin: const EdgeInsets.symmetric(vertical: 10),
+                       // color: Colors.white,
                         child: ListTile(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10)
+                            )
+                          ),
                           tileColor: Colors.blue, // Change color to indicate card
                           contentPadding: const EdgeInsets.all(16), // Add padding for content
-
                           leading:   CircleAvatar( // Display user image here
                             backgroundColor: Colors.white,
-                            // child: Text(
-                            //   _foundUsers[index].numpiece, // Replace with user image or initials
-                            //   style: const TextStyle(
-                            //     fontSize: 16,
-                            //     color: Colors.blue, // Text color to match card color
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
-                            child: InkWell(child: Icon(Icons.edit),
+                            child: InkWell(child: const Icon(Icons.edit),
                             onTap: (){
                               showModalBottomSheet(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(25),
+                                  )
+                                ),
                                 context: context,
                                 isScrollControlled: true,
                                 builder: (context) {
-                                  return Container(
-                                    height: MediaQuery.of(context).size.height * 0.5,
 
-                                  );
+                                      return Container(
+                                          height: MediaQuery.of(context).size.height * 0.9,
+                                          padding: const EdgeInsets.all(25),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                _foundLigneCmd[index].designation,
+                                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                              ),
+                                              const SizedBox(height: 25,),
+                                              Form(
+                                                child: Column(
+                                                  children: [
+                                                    TextFormField(
+                                                      readOnly: true,
+                                                      decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        labelText: 'La Quantité demandée : 10',
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20,),
+                                                    TextFormField(
+                                                      decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        labelText: 'La Quantité Livrée : 10',
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20,),
+                                                    TextFormField(
+                                                      decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        labelText: 'La Quantité vérifiée : 10',
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20,),
+                                                    TextFormField(
+                                                      decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        labelText: 'Observation :',
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20,),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        ElevatedButton(
+                                                          onPressed: (){},
+                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey)),
+                                                          child: const Text("Verrouiller"),
+                                                        ),
+                                                        const SizedBox(width: 10,),
+                                                        ElevatedButton(
+                                                          onPressed: (){},
+                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
+                                                          child: const Text("Modifier"),
+                                                        ),
+                                                        const SizedBox(width: 10,),
+                                                        ElevatedButton(
+                                                          onPressed: (){Navigator.pop(context);},
+                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                                                          child: const Text("Annuler"),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                      );
+                                    },
 
-                                  },
                               );
                             },
                             ),
                           ),
-
                           title:
                           Container(
                             margin: const EdgeInsets.only(bottom: 8),
@@ -141,7 +214,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${_foundUsers[index].numpiece} (0_pics)',
+                                  '${_foundLigneCmd[index].numpiece} (0_pics)',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -149,7 +222,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                 ),
                                 const SizedBox(height: 8,),
                                 Text(
-                                  _foundUsers[index].designation,
+                                  _foundLigneCmd[index].designation,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -160,7 +233,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                           ),
 
                           subtitle: Text(
-                            "Quantité: ${_foundUsers[index].quantite}",
+                            "Quantité: ${_foundLigneCmd[index].quantite}",
                             style: const TextStyle(
                               color: Colors.white, // Subtitle color for readability
                               fontWeight: FontWeight.bold,
@@ -171,25 +244,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Tooltip(
-                              //   message: 'Edit', // Tooltip for clarity
-                              //   child: InkWell(
-                              //     child: const Icon(
-                              //       Icons.edit,
-                              //       color: Colors.black,
-                              //       size: 20,
-                              //     ),
-                              //     onTap: () {
-                              //       showModalBottomSheet(
-                              //         context: context,
-                              //         isScrollControlled: true,
-                              //         builder: (context) {
-                              //           return Text("Quantité");
-                              //         },
-                              //       );
-                              //     },
-                              //   ),
-                              // ),
+
                               Tooltip(
                                 message: 'View Details', // Tooltip for clarity
                                 child: InkWell(
@@ -200,7 +255,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                   ),
                                   onTap: () {
                                     Navigator.pushNamed(context, '/gallery',
-                                        arguments: _foundUsers[index].designation);
+                                        arguments: _foundLigneCmd[index].designation);
                                   },
                                 ),
                               ),
@@ -231,9 +286,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                       'Aucun résultat trouvé',
                       style: TextStyle(fontSize: 24),
                     ),
-                  )
-                  ,
-
+                  ),
                 ],
 
               ),
@@ -251,12 +304,12 @@ class _DetailsCmdState extends State<DetailsCmd> {
   final inputSearch= TextEditingController();
 
   // This list holds the data for the list view
-  List<LigneC> _foundUsers = [];
+  List<LigneC> _foundLigneCmd = [];
 
   @override
   initState() {
 
-    _foundUsers = LigneCommands;
+    _foundLigneCmd = LigneCommands;
     super.initState();
   }
   void _runFilter(String enteredKeyword) {
@@ -272,9 +325,9 @@ class _DetailsCmdState extends State<DetailsCmd> {
       // We use the toLowerCase() method to make it case-insensitive
     }
 
-    // Update the _foundUsers list and trigger a rebuild
+    // Update the _foundLigneCmd list and trigger a rebuild
     setState(() {
-      _foundUsers = results;
+      _foundLigneCmd = results;
     });
   }
 

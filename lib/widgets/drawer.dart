@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
 
+import '../models/compte.dart';
+import '../providers/compte_provider.dart';
+
 
 class MyDrawer extends StatelessWidget {
 
@@ -10,27 +13,29 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<CompteProvider>(context);
+    Compte compte = provider.compte;
     return  Drawer(
       semanticLabel: "Menu",
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+           DrawerHeader(
+            decoration: const BoxDecoration(
               color: Colors.blueAccent,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage("assets/man.png"),
+                  backgroundImage: AssetImage("assets/${compte.role}.png"),
                   // Adjust the size of the CircleAvatar if needed
                   radius: 50, // Change this radius as desired
                 ),
-                SizedBox(height: 8), // Add some space between the image and text
+                const SizedBox(height: 8), // Add some space between the image and text
                 Text(
-                  "Controller 1 : Amine",
-                  style: TextStyle(
+                  "${compte.role} : ${compte.name}",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18, // Adjust the font size as desired
                   ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_app/models/compte.dart';
 import 'package:flutter_app/models/ligne_c.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,7 +14,39 @@ class ApiService {
     this.token = token;
   }
 
-  final String baseurl = "http://192.168.1.42:4300/api";
+  final String baseurl = "http://192.168.1.100:4300/api";
+
+  // Future<List<Compte>> fetchCompte() async {
+  //   http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
+  //     headers: {
+  //       HttpHeaders.contentTypeHeader: 'application/json',
+  //       HttpHeaders.acceptHeader: 'application/json',
+  //       HttpHeaders.authorizationHeader: 'Bearer $token'
+  //     }
+  //   );
+  //   List compte = jsonDecode(response.body);
+  //   return compte.map((compte) => Compte.fromJson(compte)).toList();
+  // }
+
+  Future<Compte> fetchCompte() async {
+    http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        }
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> compteData = jsonDecode(response.body);
+      Compte compte = Compte.fromJson(compteData);
+      return compte;
+    } else {
+      // Handle error cases here if needed.
+      throw Exception('Failed to fetch Compte');
+    }
+  }
+
 
   Future<List<Commande>> fetchCommands() async {
     http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
@@ -21,7 +54,8 @@ class ApiService {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token'
-        });
+        }
+        );
     List commandes = jsonDecode(response.body);
     return commandes.map((commande) => Commande.fromJson(commande)).toList();
   }

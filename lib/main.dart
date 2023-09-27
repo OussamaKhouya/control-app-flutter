@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
+import 'package:flutter_app/providers/compte_provider.dart';
 import 'package:flutter_app/providers/ligne_commande_provider.dart';
 import 'package:flutter_app/views/commands.dart';
 import 'package:flutter_app/views/compte_view.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_app/views/gallery.dart';
 import 'package:flutter_app/views/login.dart';
 import 'package:flutter_app/views/register.dart';
 import 'package:provider/provider.dart';
-
 import 'package:flutter_app/providers/auth_provider.dart';
 
 
@@ -32,11 +32,17 @@ class MyApp extends StatelessWidget {
               ),
               ChangeNotifierProvider<LigneCProvider>(
                 create: (context) => LigneCProvider(authProvider),
+              ),
+              ChangeNotifierProvider<CompteProvider>(
+                create: (context) => CompteProvider(authProvider),
               )
             ],
             child: MaterialApp(
               title: 'Application Flutter de control de preparation des commandes',
               debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                // fontFamily: 'Oswald'
+              ),
               routes: {
                 '/': (context) {
                   final authProvider = Provider.of<AuthProvider>(context);
