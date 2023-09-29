@@ -40,9 +40,9 @@ class MyApp extends StatelessWidget {
             child: MaterialApp(
               title: 'Application Flutter de control de preparation des commandes',
               debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                // fontFamily: 'Oswald'
-              ),
+              // theme: ThemeData(
+              //    fontFamily: 'Roboto'
+              // ),
               routes: {
                 '/': (context) {
                   final authProvider = Provider.of<AuthProvider>(context);

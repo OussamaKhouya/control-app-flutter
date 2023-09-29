@@ -32,7 +32,7 @@ dependencies:
     sdk: flutter
   image_picker: ^0.8.4+2
   path_provider: ^2.0.8
-
+  flutter_spinkit: ^5.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -55,7 +55,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_native_splash: ^2.0.1+1
 
+flutter_native_splash:
+  color : "#ffffff"
+  image : assets/COMMERCIAL.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -86,9 +90,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Oswald
+    - family: Roboto
       fonts:
-        - asset: assets/font/Oswald-VariableFont_wght.ttf
+        - asset: assets/font/Roboto-Bold.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

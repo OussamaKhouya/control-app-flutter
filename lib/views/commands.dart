@@ -3,11 +3,13 @@ import 'package:flutter_app/models/commande.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
 import 'package:flutter_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Commands extends StatefulWidget {
   const Commands({Key? key}) : super(key: key);
   @override
   State<Commands> createState() => _HomePageState();
+
 }
 
 
@@ -15,11 +17,11 @@ class _HomePageState extends State<Commands> {
 
 
   List<Commande> commands=[];
+  List<Commande> _foundCommands = [];
+
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CommandProvider>(context);
-    commands = provider.commands;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Liste des Commandes'),
@@ -44,6 +46,7 @@ class _HomePageState extends State<Commands> {
                       suffixIcon: InkWell(
                         child: const Icon(Icons.close),
                         onTap: () {
+
                           inputSearch.clear();
                           _runFilter('');
                         },
@@ -62,8 +65,13 @@ class _HomePageState extends State<Commands> {
                       child: InkWell(
                         child: const Icon(Icons.refresh,color: Colors.white,),
                         onTap: (){
-                          inputSearch.clear();
-                          _runFilter('');
+                          final provider = Provider.of<CommandProvider>(context,listen: false);
+
+                         inputSearch.clear();
+                           _runFilter('');
+                           setState(() {
+                             _foundCommands=provider.commands;
+                           });
                         },
                       ),
                     )
@@ -102,10 +110,17 @@ class _HomePageState extends State<Commands> {
                   ),
                 ),
               )
-                  : const Text(
-                'Aucun résultat trouvé',
-                style: TextStyle(fontSize: 24),
-              ),
+                  :
+              const Column(
+                children: [
+                  Text("Aucun résultat trouvé", style: TextStyle(fontSize: 24),),
+                  SpinKitRing(
+                    color: Colors.blue,
+                    size: 50.0,
+                  )
+                ],
+              )
+
             ),
           ],
         ),
@@ -114,19 +129,19 @@ class _HomePageState extends State<Commands> {
 
   }
 
-
   final inputSearch= TextEditingController();
-  List<Commande> _foundCommands = [];
-
   @override
-  initState() {
-    _foundCommands=commands;
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = Provider.of<CommandProvider>(context);
+    commands = provider.commands;
+    _foundCommands = List.from(commands);
   }
+
 
   //Fonction filter qui sert à filtrer data en changant la valeur de l'input search
   void _runFilter(String enteredKeyword) {
-
+    print("RunFilter Methode : ${commands.length}");
     List<Commande> results = [];
 
     if (enteredKeyword.isEmpty) {

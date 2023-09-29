@@ -16,17 +16,7 @@ class ApiService {
 
   final String baseurl = "http://192.168.1.100:4300/api";
 
-  // Future<List<Compte>> fetchCompte() async {
-  //   http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
-  //     headers: {
-  //       HttpHeaders.contentTypeHeader: 'application/json',
-  //       HttpHeaders.acceptHeader: 'application/json',
-  //       HttpHeaders.authorizationHeader: 'Bearer $token'
-  //     }
-  //   );
-  //   List compte = jsonDecode(response.body);
-  //   return compte.map((compte) => Compte.fromJson(compte)).toList();
-  // }
+
 
   Future<Compte> fetchCompte() async {
     http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
