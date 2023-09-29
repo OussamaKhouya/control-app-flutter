@@ -269,11 +269,8 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
                                   ),
                                   onTap: () async {
-                                    final image = await _pickImageCamera();
-                                    if (image != null) {
-                                      _setPickedImage(image);
-                                      await _saveImageToDirectory(image);
-                                    }
+                                    Navigator.pushNamed(
+                                        context, '/camera');
                                   },
                                 ),
                               ),
