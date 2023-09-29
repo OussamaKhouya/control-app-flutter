@@ -22,7 +22,7 @@ class _LoginState extends State<Login> {
   late String deviceName;
 
   String errorMessage = '';
-
+  bool _isObscured = true;
   @override
   void initState() {
     super.initState();
@@ -59,10 +59,10 @@ class _LoginState extends State<Login> {
                               }
                               return null;
                             },
-                            decoration: InputDecoration(labelText: 'Nom d\'utilisateur'),
+                            decoration: const InputDecoration(labelText: 'Nom d\'utilisateur'),
                           ),
                           TextFormField(
-                            obscureText: true,
+                            obscureText: _isObscured,
                             enableSuggestions: false,
                             autocorrect: false,
                             controller: passwordController,
@@ -72,7 +72,17 @@ class _LoginState extends State<Login> {
                               }
                               return null;
                             },
-                            decoration: InputDecoration(labelText: 'Mot de passe'),
+                            decoration: InputDecoration(
+                                labelText: 'Mot de passe',
+                              suffixIcon: IconButton(
+                                icon: Icon(_isObscured ? Icons.visibility: Icons.visibility_off), onPressed: () {
+                                  setState(() {
+                                    _isObscured = !_isObscured;
+                                  });
+                              },
+                              )
+                            ),
+
                           ),
                           ElevatedButton(
                             onPressed: () => submit(),

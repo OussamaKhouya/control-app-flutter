@@ -17,6 +17,7 @@ class ApiService {
   final String baseurl = "http://192.168.1.100:4300/api";
 
 
+
   Future<Compte> fetchCompte() async {
     http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
         headers: {
@@ -43,7 +44,8 @@ class ApiService {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token'
-        });
+        }
+        );
     List commandes = jsonDecode(response.body);
     return commandes.map((commande) => Commande.fromJson(commande)).toList();
   }
@@ -58,8 +60,8 @@ class ApiService {
     return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
   }
 
-  Future<String> register(String name, String username, String role,
-      String password, String passworConfirm, String deviceName) async {
+  Future<String> register(String name, String username, String role, String password,
+      String passworConfirm, String deviceName) async {
     String uri = '$baseurl/auth/register';
 
     http.Response response = await http.post(Uri.parse(uri),

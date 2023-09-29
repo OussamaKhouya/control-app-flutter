@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
 import 'package:flutter_app/providers/ligne_commande_provider.dart';
-import 'package:flutter_app/views/camera_screen.dart';
 import 'package:flutter_app/views/commands.dart';
 import 'package:flutter_app/views/compte_view.dart';
 import 'package:flutter_app/views/datails_cmd.dart';
@@ -39,11 +38,14 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider<CompteProvider>(
                 create: (context) => CompteProvider(authProvider),
               )
-              
+
             ],
             child: MaterialApp(
               title: 'Application Flutter de control de preparation des commandes',
               debugShowCheckedModeBanner: false,
+              // theme: ThemeData(
+              //    fontFamily: 'Roboto'
+              // ),
               routes: {
                 '/': (context) {
                   final authProvider = Provider.of<AuthProvider>(context);

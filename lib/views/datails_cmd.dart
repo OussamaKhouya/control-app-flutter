@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import '../providers/ligne_commande_provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 class DetailsCmd extends StatefulWidget {
 
   const DetailsCmd({super.key});
@@ -29,10 +30,10 @@ class _DetailsCmdState extends State<DetailsCmd> {
   @override
   Widget build(BuildContext context) {
 
-    final provider = Provider.of<LigneCProvider>(context);
+
     String numpiece = ModalRoute.of(context)?.settings.arguments as String;
 
-    LigneCommands = provider.ligne_commands;
+
     return Scaffold(
       appBar: AppBar(
         title:  const Text('Détails de Commande'),
@@ -85,8 +86,12 @@ class _DetailsCmdState extends State<DetailsCmd> {
                               child: InkWell(
                                 child: const Icon(Icons.refresh,color: Colors.white,),
                                 onTap: (){
+                                  final provider = Provider.of<LigneCProvider>(context,listen: false);
                                   inputSearch.clear();
                                   _runFilter('');
+                                  setState(() {
+                                    _foundLigneCmd=provider.ligne_commands;
+                                  });
                                 },
                               ),
                             )
@@ -95,118 +100,117 @@ class _DetailsCmdState extends State<DetailsCmd> {
                     ],
                   ),
                   const SizedBox(height: 15,),
-                  Expanded(
-                    child: _foundLigneCmd.isNotEmpty
-                        ? ListView.builder(
-                      itemCount: _foundLigneCmd.length,
-                      itemBuilder: (context, index) => Card(
-                        shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10)
-                              )
-                          ),
-                        key: ValueKey(_foundLigneCmd[index].numpiece),
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                       // color: Colors.white,
-                        child: ListTile(
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10)
-                            )
-                          ),
-                          tileColor: Colors.blue, // Change color to indicate card
-                          contentPadding: const EdgeInsets.all(16), // Add padding for content
-                          leading:   CircleAvatar( // Display user image here
-                            backgroundColor: Colors.white,
-                            child: InkWell(child: const Icon(Icons.edit),
-                            onTap: (){
-                              showModalBottomSheet(
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(25),
-                                  )
-                                ),
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (context) {
-
-                                      return Container(
-                                          height: MediaQuery.of(context).size.height * 0.9,
-                                          padding: const EdgeInsets.all(25),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                _foundLigneCmd[index].designation,
-                                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 25,),
-                                              Form(
-                                                child: Column(
-                                                  children: [
-                                                    TextFormField(
-                                                      readOnly: true,
-                                                      decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        labelText: 'La Quantité demandée : 10',
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 20,),
-                                                    TextFormField(
-                                                      decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        labelText: 'La Quantité Livrée : 10',
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 20,),
-                                                    TextFormField(
-                                                      decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        labelText: 'La Quantité vérifiée : 10',
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 20,),
-                                                    TextFormField(
-                                                      decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        labelText: 'Observation :',
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 20,),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        ElevatedButton(
-                                                          onPressed: (){},
-                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey)),
-                                                          child: const Text("Verrouiller"),
-                                                        ),
-                                                        const SizedBox(width: 10,),
-                                                        ElevatedButton(
-                                                          onPressed: (){},
-                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
-                                                          child: const Text("Modifier"),
-                                                        ),
-                                                        const SizedBox(width: 10,),
-                                                        ElevatedButton(
-                                                          onPressed: (){Navigator.pop(context);},
-                                                          style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
-                                                          child: const Text("Annuler"),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                      );
-                                    },
-
-                              );
-                            },
+        Expanded(
+          child: _foundLigneCmd.isNotEmpty
+              ? ListView.builder(
+            itemCount: _foundLigneCmd.length,
+            itemBuilder: (context, index) => Card(
+              shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(10)
+                    )
+                ),
+              key: ValueKey(_foundLigneCmd[index].numpiece),
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 10),
+             // color: Colors.white,
+              child: ListTile(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10)
+                  )
+                ),
+                tileColor: Colors.blue, // Change color to indicate card
+                contentPadding: const EdgeInsets.all(16), // Add padding for content
+                leading:   CircleAvatar( // Display user image here
+                  backgroundColor: Colors.white,
+                  child: InkWell(child: const Icon(Icons.edit),
+                  onTap: (){
+                    showModalBottomSheet(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(25),
+                        )
+                      ),
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+     return SafeArea(
+       child: Container(
+                height: MediaQuery.of(context).size.height*0.97,
+                padding: const EdgeInsets.all(25),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        _foundLigneCmd[index].designation,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 21,),
+                      Form(
+                        child: Column(
+                          children: [
+                            Text("La quanitité demandé : ${_foundLigneCmd[index].quantite}",style: const TextStyle(
+                              fontSize: 18,fontWeight: FontWeight.bold,color: Colors.blue
+                            ),),
+                            const SizedBox(height: 17,),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'La Quantité Livrée : 10',
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 15,),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'La Quantité vérifiée : 10',
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Observation :',
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: (){},
+                                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey)),
+                                  child: const Text("Verrouiller"),
+                                ),
+                                const SizedBox(width: 10,),
+                                ElevatedButton(
+                                  onPressed: (){},
+                                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
+                                  child: const Text("Modifier"),
+                                ),
+                                const SizedBox(width: 10,),
+                                ElevatedButton(
+                                  onPressed: (){Navigator.pop(context);},
+                                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                                  child: const Text("Annuler"),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ),
+     );
+        },
+
+  );
+                  },
+                  ),
+                ),
                           title:
                           Container(
                             margin: const EdgeInsets.only(bottom: 8),
@@ -279,10 +283,15 @@ class _DetailsCmdState extends State<DetailsCmd> {
                         ),
                       ),
                     )
-                        : const Text(
-                      'Aucun résultat trouvé',
-                      style: TextStyle(fontSize: 24),
-                    ),
+                        :   const Column(
+            children: [
+              Text("Aucun résultat trouvé", style: TextStyle(fontSize: 24),),
+              SpinKitRing(
+                color: Colors.blue,
+                size: 50.0,
+              )
+            ],
+          )
                   ),
                 ],
 
@@ -304,11 +313,14 @@ class _DetailsCmdState extends State<DetailsCmd> {
   List<LigneC> _foundLigneCmd = [];
 
   @override
-  initState() {
-
-    _foundLigneCmd = LigneCommands;
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = Provider.of<LigneCProvider>(context);
+    LigneCommands = provider.ligne_commands;
+    _foundLigneCmd = List.from(LigneCommands);
   }
+
+
   void _runFilter(String enteredKeyword) {
     List<LigneC> results = [];
     if (enteredKeyword.isEmpty) {

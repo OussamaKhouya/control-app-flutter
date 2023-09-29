@@ -27,7 +27,8 @@ class _RegisterState extends State<Register> {
   String errorMessage = '';
 
   final _roles = ["Saisie", "Commercial","Control1","Control2"];
-
+  bool _isObscured1=true;
+  bool _isObscured2=true;
   @override
   void initState() {
     super.initState();
@@ -98,7 +99,7 @@ class _RegisterState extends State<Register> {
                                   value: roleController.text,
                                 ),
                                 TextFormField(
-                                  obscureText: true,
+                                  obscureText: _isObscured1,
                                   enableSuggestions: false,
                                   autocorrect: false,
                                   controller: passwordController,
@@ -110,10 +111,18 @@ class _RegisterState extends State<Register> {
                                   },
                                   onChanged: (text) =>
                                       setState(() => errorMessage = ''),
-                                  decoration: const InputDecoration(labelText: 'Mot de passe'),
+                                  decoration:  InputDecoration(labelText: 'Mot de passe',
+                                      suffixIcon: IconButton(
+                                        icon: Icon(_isObscured1 ? Icons.visibility: Icons.visibility_off), onPressed: () {
+                                        setState(() {
+                                          _isObscured1 = !_isObscured1;
+                                        });
+                                      },
+                                      )
+                                  ),
                                 ),
                                 TextFormField(
-                                  obscureText: true,
+                                  obscureText: _isObscured2,
                                   enableSuggestions: false,
                                   autocorrect: false,
                                   controller: passwordConfirmController,
@@ -126,7 +135,15 @@ class _RegisterState extends State<Register> {
                                   onChanged: (text) =>
                                       setState(() => errorMessage = ''),
                                   decoration:
-                                  const InputDecoration(labelText: 'Confirmer mot de passe'),
+                                   InputDecoration(labelText: 'Confirmer mot de passe',
+                                       suffixIcon: IconButton(
+                                         icon: Icon(_isObscured2 ? Icons.visibility: Icons.visibility_off), onPressed: () {
+                                         setState(() {
+                                           _isObscured2 = !_isObscured2;
+                                         });
+                                       },
+                                       )
+                                  ),
                                 ),
                                 ElevatedButton(
                                   onPressed: () => submit(),
