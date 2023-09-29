@@ -43,6 +43,9 @@ dependencies:
   galleryimage: 2.0.1
   shared_preferences: 2.0.7
   intl: 0.17.0
+  path: ^1.8.0
+  camera: ^0.10.5+4
+  get: any
 
 dev_dependencies:
   flutter_test:

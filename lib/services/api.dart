@@ -13,32 +13,31 @@ class ApiService {
     this.token = token;
   }
 
-  final String baseurl = "http://192.168.1.42:4300/api";
+  final String baseurl = "http://192.168.1.100:4300/api";
 
   Future<List<Commande>> fetchCommands() async {
-    http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $token'
-        });
+    http.Response response =
+        await http.get(Uri.parse('$baseurl/commandes'), headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token'
+    });
     List commandes = jsonDecode(response.body);
     return commandes.map((commande) => Commande.fromJson(commande)).toList();
   }
 
   Future<List<LigneC>> fetchLigneC() async {
     http.Response response =
-        await http.get(Uri.parse('$baseurl/ligne-commandes'),
-          headers: {
-            HttpHeaders.acceptHeader: 'application/json',
-            HttpHeaders.authorizationHeader: 'Bearer $token'
-          });
+        await http.get(Uri.parse('$baseurl/ligne-commandes'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token'
+    });
     List ligneCmd = jsonDecode(response.body);
     return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
   }
 
-  Future<String> register(String name, String username, String role, String password,
-      String passworConfirm, String deviceName) async {
+  Future<String> register(String name, String username, String role,
+      String password, String passworConfirm, String deviceName) async {
     String uri = '$baseurl/auth/register';
 
     http.Response response = await http.post(Uri.parse(uri),
@@ -71,7 +70,8 @@ class ApiService {
     }
   }
 
-  Future<String> login(String username, String password, String deviceName) async {
+  Future<String> login(
+      String username, String password, String deviceName) async {
     String uri = '$baseurl/auth/login';
 
     http.Response response = await http.post(Uri.parse(uri),
@@ -98,5 +98,30 @@ class ApiService {
       });
       throw Exception(errorMessage);
     }
+  }
+
+  Future<http.StreamedResponse> uploadImage(File file, String numpiece,String numero, String fileName) async {
+    String url = '$baseurl/file/upload';
+    http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
+
+    request.headers.addAll(<String, String>{
+      HttpHeaders.contentTypeHeader: 'multipart/form-data',
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer ${token}'
+    });
+
+    request.fields.addAll(<String, String>{
+      'numero': numero,
+      'fileName': fileName,
+      'numpiece': numpiece,
+    });
+
+    request.files.add(http.MultipartFile(
+        'file', file.readAsBytes().asStream(), file.lengthSync(),
+        filename: file.path.split('/').last));
+
+    http.StreamedResponse response = await request.send();
+    print('inside uploadImage ApiService');
+    return response;
   }
 }

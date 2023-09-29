@@ -12,6 +12,7 @@ class CommandProvider extends ChangeNotifier {
   CommandProvider(AuthProvider authProvider) {
     this.authProvider = authProvider;
     apiService = ApiService(authProvider.token);
+    print(apiService.baseurl);
     init();
   }
 

@@ -1,12 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/ligne_c.dart';
-import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import '../providers/ligne_commande_provider.dart';
-class DetailsCmd extends StatefulWidget {
+import 'package:provider/provider.dart';
 
+import '../providers/ligne_commande_provider.dart';
+
+class DetailsCmd extends StatefulWidget {
   const DetailsCmd({super.key});
 
   @override
@@ -14,10 +16,7 @@ class DetailsCmd extends StatefulWidget {
 }
 
 class _DetailsCmdState extends State<DetailsCmd> {
-
-
   File? _pickedImage; // Define a variable to store the picked image
-
 
   // Function to set the picked image and trigger a rebuild
   void _setPickedImage(File image) {
@@ -25,250 +24,260 @@ class _DetailsCmdState extends State<DetailsCmd> {
       _pickedImage = image;
     });
   }
-  List<LigneC> LigneCommands=[];
+
+  List<LigneC> LigneCommands = [];
+
   @override
   Widget build(BuildContext context) {
-
     final provider = Provider.of<LigneCProvider>(context);
     String numpiece = ModalRoute.of(context)?.settings.arguments as String;
 
     LigneCommands = provider.ligne_commands;
     return Scaffold(
       appBar: AppBar(
-        title:  const Text('Détails de Commande'),
+        title: const Text('Détails de Commande'),
       ),
-     // drawer: const MyDrawer( popCmd: false,popAccount: false,),
-
-      body:
-
-      SafeArea(
-
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 35,),
-                   Text("Liste des Articles de Commande: $numpiece", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                   textAlign: TextAlign.center,
-                   ),
-                  const SizedBox(height: 35,),
-                  Row(
-                    children: [
-                      const SizedBox(height: 25,),
-                      Expanded(
-                        child: TextField(
-
-                          controller: inputSearch,
-                          onChanged: (value) => _runFilter(value),
-                          decoration: InputDecoration(
-                            labelText: 'Rechercher',
-                            suffixIcon: InkWell(
-                              child: Icon(Icons.close,color: Colors.grey[700],),
+      // drawer: const MyDrawer( popCmd: false,popAccount: false,),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Center(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 35,
+                ),
+                Text(
+                  "Liste des Articles de Commande: $numpiece",
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 35,
+                ),
+                Row(
+                  children: [
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: inputSearch,
+                        onChanged: (value) => _runFilter(value),
+                        decoration: InputDecoration(
+                          labelText: 'Rechercher',
+                          suffixIcon: InkWell(
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.grey[700],
+                            ),
+                            onTap: () {
+                              inputSearch.clear();
+                              _runFilter('');
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Material(
+                          borderRadius: BorderRadius.circular(4.0),
+                          // Adjust the border radius as needed
+                          color: Colors.blue,
+                          elevation: 1.0,
+                          // Add elevation for a button-like appearance
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            // Add space around the icon
+                            child: InkWell(
+                              child: const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                              ),
                               onTap: () {
                                 inputSearch.clear();
                                 _runFilter('');
                               },
                             ),
-                          ),
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
-                        child: Material(
-                            borderRadius: BorderRadius.circular(4.0), // Adjust the border radius as needed
-                            color: Colors.blue,
-                            elevation: 1.0, // Add elevation for a button-like appearance
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0), // Add space around the icon
-                              child: InkWell(
-                                child: const Icon(Icons.refresh,color: Colors.white,),
-                                onTap: (){
-                                  inputSearch.clear();
-                                  _runFilter('');
-                                },
-                              ),
-                            )
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 15,),
-                  Expanded(
-                    child: _foundUsers.isNotEmpty
-                        ? ListView.builder(
-                      itemCount: _foundUsers.length,
-                      itemBuilder: (context, index) => Card(
-                        key: ValueKey(_foundUsers[index].numpiece),
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        child: ListTile(
-                          tileColor: Colors.blue, // Change color to indicate card
-                          contentPadding: const EdgeInsets.all(16), // Add padding for content
-
-                          leading:   CircleAvatar( // Display user image here
-                            backgroundColor: Colors.white,
-                            // child: Text(
-                            //   _foundUsers[index].numpiece, // Replace with user image or initials
-                            //   style: const TextStyle(
-                            //     fontSize: 16,
-                            //     color: Colors.blue, // Text color to match card color
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
-                            child: InkWell(child: Icon(Icons.edit),
-                            onTap: (){
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (context) {
-                                  return Container(
-                                    height: MediaQuery.of(context).size.height * 0.5,
-
-                                  );
-
-                                  },
-                              );
-                            },
-                            ),
-                          ),
-
-                          title:
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${_foundUsers[index].numpiece} (0_pics)',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8,),
-                                Text(
-                                  _foundUsers[index].designation,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          subtitle: Text(
-                            "Quantité: ${_foundUsers[index].quantite}",
-                            style: const TextStyle(
-                              color: Colors.white, // Subtitle color for readability
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15
-                            ),
-                          ),
-
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Tooltip(
-                              //   message: 'Edit', // Tooltip for clarity
-                              //   child: InkWell(
-                              //     child: const Icon(
-                              //       Icons.edit,
-                              //       color: Colors.black,
-                              //       size: 20,
-                              //     ),
-                              //     onTap: () {
-                              //       showModalBottomSheet(
-                              //         context: context,
-                              //         isScrollControlled: true,
-                              //         builder: (context) {
-                              //           return Text("Quantité");
-                              //         },
-                              //       );
-                              //     },
-                              //   ),
-                              // ),
-                              Tooltip(
-                                message: 'View Details', // Tooltip for clarity
-                                child: InkWell(
-                                  child: const Icon(
-                                    Icons.remove_red_eye,
-                                    color: Colors.white,
-
-                                  ),
-                                  onTap: () {
-                                    Navigator.pushNamed(context, '/gallery',
-                                        arguments: _foundUsers[index].designation);
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              Tooltip(
-                                message: 'Capture Image', // Tooltip for clarity
-                                child: InkWell(
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-
-                                  ),
-                                  onTap: () async {
-                                    final image = await _pickImageCamera();
-                                    if (image != null) {
-                                      _setPickedImage(image);
-                                      await _saveImageToDirectory(image);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                          )),
                     )
-                        : const Text(
-                      'Aucun résultat trouvé',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  )
-                  ,
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Expanded(
+                  child: _foundUsers.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: _foundUsers.length,
+                          itemBuilder: (context, index) => Card(
+                            key: ValueKey(_foundUsers[index].numpiece),
+                            elevation: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: ListTile(
+                              tileColor: Colors.blue,
+                              // Change color to indicate card
+                              contentPadding: const EdgeInsets.all(16),
+                              // Add padding for content
 
-                ],
+                              leading: CircleAvatar(
+                                // Display user image here
+                                backgroundColor: Colors.white,
+                                // child: Text(
+                                //   _foundUsers[index].numpiece, // Replace with user image or initials
+                                //   style: const TextStyle(
+                                //     fontSize: 16,
+                                //     color: Colors.blue, // Text color to match card color
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
+                                child: InkWell(
+                                  child: Icon(Icons.edit),
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        return Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.5,
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
 
-              ),
+                              title: Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${_foundUsers[index].numpiece} (0_pics)',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      _foundUsers[index].designation,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              subtitle: Text(
+                                "Quantité: ${_foundUsers[index].quantite}",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    // Subtitle color for readability
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15),
+                              ),
+
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Tooltip(
+                                  //   message: 'Edit', // Tooltip for clarity
+                                  //   child: InkWell(
+                                  //     child: const Icon(
+                                  //       Icons.edit,
+                                  //       color: Colors.black,
+                                  //       size: 20,
+                                  //     ),
+                                  //     onTap: () {
+                                  //       showModalBottomSheet(
+                                  //         context: context,
+                                  //         isScrollControlled: true,
+                                  //         builder: (context) {
+                                  //           return Text("Quantité");
+                                  //         },
+                                  //       );
+                                  //     },
+                                  //   ),
+                                  // ),
+                                  Tooltip(
+                                    message: 'View Details',
+                                    // Tooltip for clarity
+                                    child: InkWell(
+                                      child: const Icon(
+                                        Icons.remove_red_eye,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pushNamed(context, '/gallery',
+                                            arguments:
+                                                _foundUsers[index].designation);
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Tooltip(
+                                    message: 'Capture Image',
+                                    // Tooltip for clarity
+                                    child: InkWell(
+                                        child: const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                        ),
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/camera');
+                                        }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          'Aucun résultat trouvé',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                ),
+              ],
             ),
           ),
         ),
-
-
+      ),
     );
   }
 
   /* Begin Code Filter */
 
-
-  final inputSearch= TextEditingController();
+  final inputSearch = TextEditingController();
 
   // This list holds the data for the list view
   List<LigneC> _foundUsers = [];
 
   @override
   initState() {
-
     _foundUsers = LigneCommands;
     super.initState();
   }
+
   void _runFilter(String enteredKeyword) {
     List<LigneC> results = [];
     if (enteredKeyword.isEmpty) {
       // If the search field is empty or only contains white-space, we'll display all users
       results = LigneCommands;
     } else {
-      results = LigneCommands
-          .where((ligneC) =>
-          ligneC.designation.toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
+      results = LigneCommands.where((ligneC) => ligneC.designation
+          .toLowerCase()
+          .contains(enteredKeyword.toLowerCase())).toList();
       // We use the toLowerCase() method to make it case-insensitive
     }
 
@@ -278,12 +287,11 @@ class _DetailsCmdState extends State<DetailsCmd> {
     });
   }
 
-
   /* End Code Filter*/
 
   Future<File?> _pickImageCamera() async {
     final pickedImage =
-    await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedImage == null) {
       return null; // No image picked
     }
@@ -292,12 +300,11 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
   Future<File?> _pickImageGallery() async {
     final pickedImage =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage == null) {
       return null; // No image picked
     }
     return File(pickedImage.path);
-
   }
 
   Future<void> _saveImageToDirectory(File imageFile) async {
@@ -316,7 +323,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
       // Copier l'image dans le dossier "images"
       final savedImage =
-      await imageFile.copy('${imagesDir.path}/$uniqueFileName.png');
+          await imageFile.copy('${imagesDir.path}/$uniqueFileName.png');
       print('Image sauvegardée dans : ${savedImage.path}');
     } catch (error) {
       print('Erreur lors de la sauvegarde de l\'image : $error');

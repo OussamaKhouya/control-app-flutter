@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:galleryimage/galleryimage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 class Gallery extends StatelessWidget {
-
 
    Gallery({super.key});
 
   List<String> listOfUrls= [
-    "https://cosmosmagazine.com/wp-content/uploads/2020/02/191010_nature.jpg",
-    "https://scx2.b-cdn.net/gfx/news/hires/2019/2-nature.jpg",
+    "http://192.168.1.100:4300/images/A12345dd/15/c1_2.jpg",
+     "http://192.168.1.100:4300/images/A12345dd/15/c1_1.jpg",
+     "http://192.168.1.100:4300/images/A12345dd/15/c2_1.png",
   ];
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,9 @@ class Gallery extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(onPressed: (){}, child: const Text("Uploader")),
+                      ElevatedButton(onPressed: (){
+                        createFolder();
+                      }, child: const Text("Uploader")),
                       const SizedBox(width: 10,),
                       ElevatedButton(onPressed: (){},
                         style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)), child: const Text("Annuler"),
@@ -53,4 +57,15 @@ class Gallery extends StatelessWidget {
       ),
     );
   }
+
+   Future<void> createFolder() async {
+     Directory? directory = await getExternalStorageDirectory();
+     String folderName = "MyFolder"; // Name of the folder you want to create
+     String directoryPath = "${directory?.path}/$folderName";
+
+     // Create the folder
+     Directory(directoryPath).create(recursive: true);
+     print("directory created!");
+     print(directoryPath);
+   }
 }
