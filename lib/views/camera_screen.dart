@@ -16,75 +16,120 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   int imageCount = 0;
   late Future<List<String>> listOfUrls;
-
+  bool imageSelected = false;
+  String designation = "";
 
   @override
   void initState() {
-
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
+    designation=ModalRoute.of(context)?.settings.arguments as String;
     final AuthProvider provider = Provider.of<AuthProvider>(context, listen: false);
     Get.lazyPut(() => ImageController(provider));
 
     final ligneCmdprovider = Provider.of<LigneCProvider>(context);
-    listOfUrls = ligneCmdprovider.getImagesUrl('A1', '01');
+    listOfUrls = ligneCmdprovider.getImagesUrl('A2', '01');
     return GetBuilder<ImageController>(builder: (imageController) {
-      return SafeArea(
-          child: Center(
-        child: SingleChildScrollView(
-            child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
+      return
+        Scaffold(
+          appBar: AppBar(
+        title:  const Text("Gallery des articles"),
+        ),
+          body: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
                     child: Column(
-                      children: <Widget>[
-                        Icon(Icons.photo_camera_front_outlined),
-                        Text('gallery'),
-                      ],
-                    ),
-                    onPressed: () {
-                      imageController.pickImageGallery();
-                    }),
-                ElevatedButton(
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.camera_alt),
-                        Text('camera'),
-                      ],
-                    ),
-                    onPressed: () {
-                      imageController.pickImageCamera();
-                    }),
-                ElevatedButton(
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.save),
-                        Text('save'),
-                      ],
-                    ),
-                    onPressed: () {
-                      imageController.saveImage();
-                    }),
-                ElevatedButton(
-                    child: Column(
-                      children: <Widget>[
-                        Icon(Icons.cloud_upload),
-                        Text('upload ($imageCount)'),
-                      ],
-                    ),
-                    onPressed: () => {
-                          if (imageCount < 2)
-                            {
-                              imageController
-                                  .uploadImage(
-                                      'A1', '01', 'c1_${imageCount + 1}')
-                                  .then((value) => {
+                      children: [
+                        const SizedBox(height: 15,),
+                        Text("Article : $designation",style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold,color: Colors.blue), textAlign: TextAlign.center,),
+                        const SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                                child: const Row(
+                                  children: <Widget>[
+                                    Icon(Icons.photo_camera_front_outlined,size: 20),
+                                    Text(' gallery'),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  imageController.pickImageGallery();
+                                  setState(() {
+                                    imageSelected=true;
+                                  });
+                                }),
+                            const SizedBox(width: 20,),
+                            ElevatedButton(
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(Icons.camera_alt,size: 20,),
+                                    Text(' camera'),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  imageController.pickImageCamera();
+                                  setState(() {
+                                    imageSelected=true;
+                                  });
+                                }),
+
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          width: 300,
+                          height: 300,
+                          color: Colors.grey[300],
+                          child: imageController.image != null
+                              ? Image.file(
+                            imageController.image!,
+                            width: 300,
+                            height: 300,
+                            fit: BoxFit.cover,
+                          )
+                              : const Center(child:Text('Please select an image',style: TextStyle(color: Colors.black,fontSize: 14,decoration: TextDecoration.none),)),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        imageSelected?
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                                child: const Row(
+                                  children: <Widget>[
+                                    Icon(Icons.save,size: 20),
+                                    Text(' save'),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  imageController.saveImage();
+                                }),
+                            const SizedBox(width: 20,),
+                            ElevatedButton(
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.cloud_upload,size: 20),
+                                    Text(' upload ($imageCount)'),
+                                  ],
+                                ),
+                                onPressed: () => {
+                                  if (imageCount < 2)
+                                    {
+                                      imageController
+                                          .uploadImage(
+                                          'A1', '01', 'c1_${imageCount + 1}')
+                                          .then((value) => {
                                         if (value)
                                           {
                                             setState(() {
@@ -92,45 +137,39 @@ class _CameraScreenState extends State<CameraScreen> {
                                             })
                                           }
                                       })
-                            }
-                        }),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              alignment: Alignment.center,
-              width: 300,
-              height: 300,
-              color: Colors.grey[300],
-              child: imageController.image != null
-                  ? Image.file(
-                      imageController.image!,
-                      width: 300,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    )
-                  : const Center(child:Text('Please select an image',style: TextStyle(color: Colors.black,fontSize: 14,decoration: TextDecoration.none),)),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FutureBuilder(
-                future: listOfUrls,
-                builder: (context, snapshot) {
-                  if(snapshot.hasData){
-                    List<String> nonNullableList = snapshot.data ?? [];
-                    return (nonNullableList.isNotEmpty)? GalleryImage(imageUrls: nonNullableList, numOfShowImages: 2):Text('no image from server');
+                                    }
+                                }
+                            ),
+                          ],
+                        ): const SizedBox(height: 10,),
+                        const Divider(color: Colors.blue,thickness: 5,),
+                        const SizedBox(height: 10),
+                        FutureBuilder(
+                            future: listOfUrls,
+                            builder: (context, snapshot) {
+                              if(snapshot.hasData){
+                                List<String> nonNullableList = snapshot.data ?? [];
+                                return (nonNullableList.isNotEmpty)? Column(
+                                  children: [
+                                    Padding(padding: const EdgeInsets.only(left: 20,right: 20),
+                                    child: Container(width: 300,alignment: Alignment.center,child: GalleryImage(imageUrls: nonNullableList, numOfShowImages: 2),)),
+                                  ],
+                                ):const Text('no image from server');
 
-                  }else if(snapshot.hasError){
-                    return Text('Something went wrong!');
-                  }
-                  return CircularProgressIndicator();
-                })
-          ],
-        )),
-      ));
-    });
+                              }else if(snapshot.hasError){
+                                return const Text('Something went wrong!');
+                              }
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                        ),const SizedBox(height: 10),
+                      ],
+                    )
+                ),
+              )
+          ),
+        );
+
+    }
+    );
   }
 }

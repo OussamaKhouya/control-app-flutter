@@ -16,6 +16,10 @@ class CommandProvider extends ChangeNotifier {
   }
 
   Future init() async {
+    await fetchCommands();
+  }
+
+  Future<void> fetchCommands() async {
     commands = await apiService.fetchCommands();
     notifyListeners();
   }

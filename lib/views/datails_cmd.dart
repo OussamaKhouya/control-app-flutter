@@ -41,7 +41,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                 Text(
                   "Liste des Articles de Commande: $numpiece",
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                      fontSize: 18, fontWeight: FontWeight.bold,color: Colors.blue),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
@@ -314,7 +314,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                         ),
                                         onTap: () async {
                                           Navigator.pushNamed(
-                                              context, '/camera');
+                                              context, '/camera',arguments: _foundLigneCmd[index].designation);
                                         },
                                       ),
                                     ),
@@ -384,44 +384,5 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
   /* End Code Filter*/
 
-  Future<File?> _pickImageCamera() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedImage == null) {
-      return null; // No image picked
-    }
-    return File(pickedImage.path);
-  }
 
-  Future<File?> _pickImageGallery() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage == null) {
-      return null; // No image picked
-    }
-    return File(pickedImage.path);
-  }
-
-  Future<void> _saveImageToDirectory(File imageFile) async {
-    try {
-      // Obtenir le répertoire d'application local
-      final appDir = await getApplicationDocumentsDirectory();
-
-      // Créer un dossier "images" s'il n'existe pas
-      final imagesDir = Directory('${appDir.path}/images');
-      if (!imagesDir.existsSync()) {
-        imagesDir.createSync(recursive: true);
-      }
-
-      // Générer un nom de fichier unique pour l'image
-      final uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-      // Copier l'image dans le dossier "images"
-      final savedImage =
-          await imageFile.copy('${imagesDir.path}/$uniqueFileName.png');
-      print('Image sauvegardée dans : ${savedImage.path}');
-    } catch (error) {
-      print('Erreur lors de la sauvegarde de l\'image : $error');
-    }
-  }
 }

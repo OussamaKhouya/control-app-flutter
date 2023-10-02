@@ -25,6 +25,7 @@
 .vscode/
 
 # Flutter repo-specific
+pubspec.lock
 /bin/cache/
 /bin/internal/bootstrap.bat
 /bin/internal/bootstrap.sh
