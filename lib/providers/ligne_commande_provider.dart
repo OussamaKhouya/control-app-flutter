@@ -15,11 +15,19 @@ class LigneCProvider extends ChangeNotifier{
     apiService = ApiService(authProvider.token);
   }
 
+  Future<void> updateTransaction(LigneC ligneC) async {
+    try {
+      await apiService.updateLignCmd(ligneC);
+      notifyListeners();
+    } catch (Exception) {
+      print(Exception);
+    }
+  }
+
+
   Future<List<LigneC>> fetchLigneC(numpiece) async {
     var list = apiService.fetchLigneC(numpiece);
     ligne_commands = await list;
-    print(ligne_commands[0].numpiece);
-    print(ligne_commands.length);
     notifyListeners();
     return list;
   }

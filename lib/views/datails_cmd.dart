@@ -1,13 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/ligne_c.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/ligne_commande_provider.dart';
+import '../widgets/ligne_cmd_edit.dart';
 
 class DetailsCmd extends StatefulWidget {
   const DetailsCmd({super.key});
@@ -19,10 +16,15 @@ class DetailsCmd extends StatefulWidget {
 class _DetailsCmdState extends State<DetailsCmd> {
   List<LigneC> LigneCommands = [];
   String numpiece = '';
+  final inputSearch = TextEditingController();
+
+  // This list holds the data for the list view
+  List<LigneC> _foundLigneCmd = [];
 
   @override
   Widget build(BuildContext context) {
-    getLignCmd();
+    final provider = Provider.of<LigneCProvider>(context);
+    getLignCmd(provider, false);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,7 +41,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                   height: 35,
                 ),
                 Text(
-                  "Liste des Articles de Commande: $numpiece",
+                  "${LigneCommands.length} Articles de Commande: $numpiece",
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
@@ -88,7 +90,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                 color: Colors.white,
                               ),
                               onTap: () {
-                                getLignCmd();
+                                getLignCmd(provider, true);
                               },
                             ),
                           )),
@@ -102,237 +104,116 @@ class _DetailsCmdState extends State<DetailsCmd> {
                     child: _foundLigneCmd.isNotEmpty
                         ? ListView.builder(
                             itemCount: _foundLigneCmd.length,
-                            itemBuilder: (context, index) => Card(
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                              key: ValueKey(_foundLigneCmd[index].numpiece),
-                              elevation: 4,
-                              margin: const EdgeInsets.symmetric(vertical: 10),
-                              // color: Colors.white,
-                              child: ListTile(
+                            itemBuilder: (context, index) {
+                              LigneC lignC = _foundLigneCmd[index];
+                              return Card(
                                 shape: const RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
-                                tileColor: Colors.blue,
-                                // Change color to indicate card
-                                contentPadding: const EdgeInsets.all(16),
-                                // Add padding for content
-                                leading: CircleAvatar(
-                                  // Display user image here
-                                  backgroundColor: Colors.white,
-                                  child: InkWell(
-                                    child: const Icon(Icons.edit),
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                            top: Radius.circular(25),
-                                          )),
-                                          context: context,
-                                          isScrollControlled: true,
-                                          builder: (context) {
-                                            return SafeArea(
-                                              child: Container(
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.97,
-                                                padding:
-                                                    const EdgeInsets.all(25),
-                                                child: SingleChildScrollView(
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        _foundLigneCmd[index]
-                                                            .designation,
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 21,
-                                                      ),
-                                                      Form(
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              "La quanitité demandé : ${_foundLigneCmd[index].quantite}",
-                                                              style: const TextStyle(
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .blue),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 17,
-                                                            ),
-                                                            TextFormField(
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                border:
-                                                                    OutlineInputBorder(),
-                                                                labelText:
-                                                                    'La Quantité Livrée : 10',
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            TextFormField(
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                border:
-                                                                    OutlineInputBorder(),
-                                                                labelText:
-                                                                    'La Quantité vérifiée : 10',
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            TextFormField(
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                border:
-                                                                    OutlineInputBorder(),
-                                                                labelText:
-                                                                    'Observation :',
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                ElevatedButton(
-                                                                  onPressed:
-                                                                      () {},
-                                                                  style: const ButtonStyle(
-                                                                      backgroundColor:
-                                                                          MaterialStatePropertyAll(
-                                                                              Colors.grey)),
-                                                                  child: const Text(
-                                                                      "Verrouiller"),
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 10,
-                                                                ),
-                                                                ElevatedButton(
-                                                                  onPressed:
-                                                                      () {},
-                                                                  style: const ButtonStyle(
-                                                                      backgroundColor:
-                                                                          MaterialStatePropertyAll(
-                                                                              Colors.blue)),
-                                                                  child: const Text(
-                                                                      "Modifier"),
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 10,
-                                                                ),
-                                                                ElevatedButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  style: const ButtonStyle(
-                                                                      backgroundColor:
-                                                                          MaterialStatePropertyAll(
-                                                                              Colors.red)),
-                                                                  child: const Text(
-                                                                      "Annuler"),
-                                                                ),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          });
-                                    },
+                                key: ValueKey(lignC.numpiece),
+                                elevation: 4,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                // color: Colors.white,
+                                child: ListTile(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  tileColor: Colors.blue,
+                                  // Change color to indicate card
+                                  contentPadding: const EdgeInsets.all(16),
+                                  // Add padding for content
+                                  leading: CircleAvatar(
+                                    // Display user image here
+                                    backgroundColor: Colors.white,
+                                    child: InkWell(
+                                      child: const Icon(Icons.edit),
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                              top: Radius.circular(25),
+                                            )),
+                                            context: context,
+                                            isScrollControlled: true,
+                                            builder: (context) {
+                                              return LigneCmdEdit(lignC,
+                                                  provider.updateTransaction);
+                                            });
+                                      },
+                                    ),
                                   ),
-                                ),
-                                title: Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${_foundLigneCmd[index].numpiece} (0_pics)',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                  title: Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${lignC.numpiece} - ${lignC.numero} (0_pics)',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        _foundLigneCmd[index].designation,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                        const SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                          lignC.designation,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    "Quantité: ${lignC.quantite}",
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        // Subtitle color for readability
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  ),
+
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Tooltip(
+                                        message: 'Capture Image',
+                                        // Tooltip for clarity
+                                        child: InkWell(
+                                          child: const Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.white,
+                                          ),
+                                          onTap: () async {
+                                            Navigator.pushNamed(
+                                                context, '/camera');
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                subtitle: Text(
-                                  "Quantité: ${_foundLigneCmd[index].quantite}",
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      // Subtitle color for readability
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15),
-                                ),
-
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Tooltip(
-                                      message: 'Capture Image',
-                                      // Tooltip for clarity
-                                      child: InkWell(
-                                        child: const Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.white,
-                                        ),
-                                        onTap: () async {
-                                          Navigator.pushNamed(
-                                              context, '/camera');
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                              );
+                            },
                           )
-                        : const Column(
+                        : Column(
                             children: [
-                              Text(
-                                "Aucun résultat trouvé",
-                                style: TextStyle(fontSize: 24),
-                              ),
-                              SpinKitRing(
-                                color: Colors.blue,
-                                size: 50.0,
-                              )
+                              if (!this.showSpinner)
+                                Text(
+                                  "Aucun résultat trouvé",
+                                  style: TextStyle(fontSize: 24),
+                                )
+                              else
+                                SpinKitRing(
+                                  color: Colors.blue,
+                                  size: 50.0,
+                                ),
                             ],
                           )),
               ],
@@ -343,19 +224,16 @@ class _DetailsCmdState extends State<DetailsCmd> {
     );
   }
 
-  /* Begin Code Filter */
+  bool showSpinner = false;
 
-  final inputSearch = TextEditingController();
-
-  // This list holds the data for the list view
-  List<LigneC> _foundLigneCmd = [];
-
-
-  void getLignCmd() async {
+  void getLignCmd(LigneCProvider provider, dbCall) async {
     numpiece = ModalRoute.of(context)?.settings.arguments as String;
-    final provider = Provider.of<LigneCProvider>(context, listen: false);
-
-    LigneCommands = await provider.fetchLigneC(numpiece);
+    if (dbCall) {
+      showSpinner = true;
+      LigneCommands = await provider.fetchLigneC(numpiece);
+      showSpinner = false;
+    }
+    LigneCommands = provider.ligne_commands;
 
     inputSearch.clear();
     _runFilter('');
@@ -380,48 +258,5 @@ class _DetailsCmdState extends State<DetailsCmd> {
     setState(() {
       _foundLigneCmd = results;
     });
-  }
-
-  /* End Code Filter*/
-
-  Future<File?> _pickImageCamera() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedImage == null) {
-      return null; // No image picked
-    }
-    return File(pickedImage.path);
-  }
-
-  Future<File?> _pickImageGallery() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage == null) {
-      return null; // No image picked
-    }
-    return File(pickedImage.path);
-  }
-
-  Future<void> _saveImageToDirectory(File imageFile) async {
-    try {
-      // Obtenir le répertoire d'application local
-      final appDir = await getApplicationDocumentsDirectory();
-
-      // Créer un dossier "images" s'il n'existe pas
-      final imagesDir = Directory('${appDir.path}/images');
-      if (!imagesDir.existsSync()) {
-        imagesDir.createSync(recursive: true);
-      }
-
-      // Générer un nom de fichier unique pour l'image
-      final uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-      // Copier l'image dans le dossier "images"
-      final savedImage =
-          await imageFile.copy('${imagesDir.path}/$uniqueFileName.png');
-      print('Image sauvegardée dans : ${savedImage.path}');
-    } catch (error) {
-      print('Erreur lors de la sauvegarde de l\'image : $error');
-    }
   }
 }

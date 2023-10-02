@@ -106,6 +106,8 @@ class _HomePageState extends State<Commands> {
                     )),
                     trailing: InkWell(child: const Icon(Icons.arrow_forward,color: Colors.white)
                     ,onTap: (){
+                        final provider = Provider.of<LigneCProvider>(context, listen: false);
+                        provider.fetchLigneC(_foundCommands[index].numpiece);
                         Navigator.pushNamed(context, '/detailsCmd', arguments:_foundCommands[index].numpiece );
                       },
                     ),

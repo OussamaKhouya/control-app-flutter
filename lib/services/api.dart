@@ -15,7 +15,7 @@ class ApiService {
     this.token = token;
   }
 
-  final String baseurl = "http://192.168.1.100:4300/api";
+  final String baseurl = "http://192.168.1.42:4300/api";
 
 
   Future<Compte> fetchCompte() async {
@@ -35,6 +35,28 @@ class ApiService {
       // Handle error cases here if needed.
       throw Exception('Failed to fetch Compte');
     }
+  }
+
+  Future<LigneC> updateLignCmd(LigneC ligne) async {
+    String uri = '$baseurl/ligne-commandes/${ligne.numero}';
+
+    http.Response response = await http.put(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+        body: jsonEncode({
+          'observation': ligne.observation,
+          'quantitePartiel': ligne.quantitePartiel,
+          'quantiteLiv': ligne.quantiteLiv,
+        }));
+
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update');
+    }
+
+    return LigneC.fromJson(jsonDecode(response.body));
   }
 
 
