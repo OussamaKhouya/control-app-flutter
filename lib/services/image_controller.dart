@@ -20,7 +20,6 @@ class ImageController extends GetxController {
   }
 
   File? image;
-  String ?imagePath;
 
   Future<void> saveImage() async {
     try {
@@ -28,7 +27,7 @@ class ImageController extends GetxController {
       final String imageDirectory = '${appDirectory?.path}/images';
       await Directory(imageDirectory).create(recursive: true);
 
-      imagePath = '$imageDirectory/image_${DateTime.now()}.jpg';
+      String imagePath = '$imageDirectory/image_${DateTime.now()}.jpg';
       if (image != null) {
         File capturedFile = File(image!.path);
         await capturedFile.copy(imagePath!);

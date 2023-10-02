@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
+import 'package:flutter_app/providers/ligne_commande_provider.dart';
 import 'package:flutter_app/services/image_controller.dart';
+import 'package:galleryimage/galleryimage.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -13,19 +15,23 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   int imageCount = 0;
+  late Future<List<String>> listOfUrls;
+
 
   @override
   void initState() {
-    final AuthProvider provider =
-        Provider.of<AuthProvider>(context, listen: false);
-
-    Get.lazyPut(() => ImageController(provider));
 
     super.initState();
+
   }
 
   @override
   Widget build(BuildContext context) {
+    final AuthProvider provider = Provider.of<AuthProvider>(context, listen: false);
+    Get.lazyPut(() => ImageController(provider));
+
+    final ligneCmdprovider = Provider.of<LigneCProvider>(context);
+    listOfUrls = ligneCmdprovider.getImagesUrl('A1', '01');
     return GetBuilder<ImageController>(builder: (imageController) {
       return SafeArea(
           child: Center(
@@ -87,7 +93,6 @@ class _CameraScreenState extends State<CameraScreen> {
                                           }
                                       })
                             }
-
                         }),
               ],
             ),
@@ -106,8 +111,23 @@ class _CameraScreenState extends State<CameraScreen> {
                       height: 300,
                       fit: BoxFit.cover,
                     )
-                  : const Text('Please select an image'),
+                  : const Center(child:Text('Please select an image',style: TextStyle(color: Colors.black,fontSize: 14,decoration: TextDecoration.none),)),
             ),
+            SizedBox(
+              height: 20,
+            ),
+            FutureBuilder(
+                future: listOfUrls,
+                builder: (context, snapshot) {
+                  if(snapshot.hasData){
+                    List<String> nonNullableList = snapshot.data ?? [];
+                    return (nonNullableList.isNotEmpty)? GalleryImage(imageUrls: nonNullableList, numOfShowImages: 2):Text('no image from server');
+
+                  }else if(snapshot.hasError){
+                    return Text('Something went wrong!');
+                  }
+                  return CircularProgressIndicator();
+                })
           ],
         )),
       ));

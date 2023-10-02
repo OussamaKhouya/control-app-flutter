@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_app/models/compte.dart';
+import 'package:flutter_app/models/image.dart';
 import 'package:flutter_app/models/ligne_c.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,7 +16,6 @@ class ApiService {
   }
 
   final String baseurl = "http://192.168.1.100:4300/api";
-
 
 
   Future<Compte> fetchCompte() async {
@@ -44,15 +44,39 @@ class ApiService {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token'
-        }
-        );
+        });
     List commandes = jsonDecode(response.body);
     return commandes.map((commande) => Commande.fromJson(commande)).toList();
   }
 
-  Future<List<LigneC>> fetchLigneC() async {
+  Future<List<LigneC>> fetchLigneC(String numpiece) async {
+    http.Response response = await http.post(Uri.parse('$baseurl/ligne-commandes/search'),
+            headers: {
+              HttpHeaders.contentTypeHeader: 'application/json', //important
+              HttpHeaders.acceptHeader: 'application/json',
+              HttpHeaders.authorizationHeader: 'Bearer $token'
+            },
+            body: jsonEncode({
+              'numpiece': numpiece,
+            })
+        );
+    print(numpiece);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      List ligneCmd = jsonDecode(response.body);
+      if(ligneCmd.isEmpty){
+        return [];
+      }
+      return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
+    } else {
+      String errorMessage = 'no data found';
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<List<LigneC>> fetchLigneC1() async {
     http.Response response =
-        await http.get(Uri.parse('$baseurl/ligne-commandes'), headers: {
+    await http.get(Uri.parse('$baseurl/ligne-commandes'), headers: {
       HttpHeaders.acceptHeader: 'application/json',
       HttpHeaders.authorizationHeader: 'Bearer $token'
     });
@@ -60,9 +84,20 @@ class ApiService {
     return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
   }
 
-  Future<String> register(String name, String username, String role, String password,
-      String passworConfirm, String deviceName) async {
-    String uri = '$baseurl/auth/register';
+  Future<List<String>> getImagesUrl(String numpiece, String numero) async {
+    http.Response response =
+    await http.get(Uri.parse('$baseurl/file/check/$numpiece/$numero'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token'
+    });
+    List imageUrls = jsonDecode(response.body);
+
+    return imageUrls.map((element) => element.toString()).toList();
+  }
+
+  Future<String> register(String name, String username, String role,
+      String password, String passworConfirm, String deviceName) async {
+   String uri = '$baseurl/auth/register';
 
     http.Response response = await http.post(Uri.parse(uri),
         headers: {

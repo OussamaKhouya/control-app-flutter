@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/commande.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
+import 'package:flutter_app/providers/ligne_commande_provider.dart';
 import 'package:flutter_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,7 +12,6 @@ class Commands extends StatefulWidget {
   State<Commands> createState() => _HomePageState();
 
 }
-
 
 class _HomePageState extends State<Commands> {
 
@@ -105,7 +105,9 @@ class _HomePageState extends State<Commands> {
                         color:Colors.white,fontWeight: FontWeight.bold
                     )),
                     trailing: InkWell(child: const Icon(Icons.arrow_forward,color: Colors.white)
-                    ,onTap: (){ Navigator.pushNamed(context, '/detailsCmd', arguments:_foundCommands[index].numpiece ); },
+                    ,onTap: (){
+                        Navigator.pushNamed(context, '/detailsCmd', arguments:_foundCommands[index].numpiece );
+                      },
                     ),
                   ),
                 ),

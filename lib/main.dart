@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
 import 'package:flutter_app/providers/commands_provider.dart';
 import 'package:flutter_app/providers/ligne_commande_provider.dart';
+import 'package:flutter_app/views/camera_screen.dart';
 import 'package:flutter_app/views/commands.dart';
 import 'package:flutter_app/views/compte_view.dart';
 import 'package:flutter_app/views/datails_cmd.dart';
