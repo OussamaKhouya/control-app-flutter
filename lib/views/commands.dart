@@ -6,20 +6,16 @@ import 'package:flutter_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+
 class Commands extends StatefulWidget {
   const Commands({Key? key}) : super(key: key);
   @override
   State<Commands> createState() => _HomePageState();
-
 }
 
 class _HomePageState extends State<Commands> {
-
-
   List<Commande> commands=[];
   List<Commande> _foundCommands = [];
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +30,6 @@ class _HomePageState extends State<Commands> {
             const SizedBox(
               height: 20,
             ),
-
             Row(
               children: [
                 Expanded(
@@ -46,7 +41,6 @@ class _HomePageState extends State<Commands> {
                       suffixIcon: InkWell(
                         child: const Icon(Icons.close),
                         onTap: () {
-
                           inputSearch.clear();
                           _runFilter('');
                         },
@@ -64,14 +58,32 @@ class _HomePageState extends State<Commands> {
                       padding: const EdgeInsets.all(8.0), // Add space around the icon
                       child: InkWell(
                         child: const Icon(Icons.refresh,color: Colors.white,),
-                        onTap: (){
-                          final provider = Provider.of<CommandProvider>(context,listen: false);
-
-                         inputSearch.clear();
-                           _runFilter('');
-                           setState(() {
-                             _foundCommands=provider.commands;
-                           });
+                        onTap: () {
+                          try{
+                            final provider = Provider.of<CommandProvider>(context,listen: false);
+                            provider.fetchCommands();
+                            _foundCommands=provider.commands;
+                          }catch (exp){
+                            print('Erreur lors de la requête API : $exp');
+                          }
+                           setState( () {
+                             inputSearch.clear();
+                             _runFilter('');
+                           }
+                           );
+                           showDialog(context: context,
+                               builder: (BuildContext context){
+                             return AlertDialog(
+                               title: const Text("Liste Actualisé",style: TextStyle(color: Colors.blue),),
+                               content: const Text("La liste a été actualisée avec succès",style: TextStyle(
+                                 color: Colors.blue
+                               ),),
+                               actions: <Widget>[
+                                 TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("OK"),)
+                               ],
+                             );
+                               }
+                           );
                         },
                       ),
                     )
@@ -113,8 +125,7 @@ class _HomePageState extends State<Commands> {
                     ),
                   ),
                 ),
-              )
-                  :
+              ) :
               const Column(
                 children: [
                   Text("Aucun résultat trouvé", style: TextStyle(fontSize: 24),),
@@ -133,6 +144,7 @@ class _HomePageState extends State<Commands> {
 
   }
 
+
   final inputSearch= TextEditingController();
   @override
   void didChangeDependencies() {
@@ -142,29 +154,36 @@ class _HomePageState extends State<Commands> {
     _foundCommands = List.from(commands);
   }
 
+  // void getCmd() async {
+  //
+  //   final provider = Provider.of<CommandProvider>(context, listen: false);
+  //
+  //   commands = await provider.fetchCommands();
+  //
+  //   inputSearch.clear();
+  //   _runFilter('');
+  //   setState(() {
+  //     _foundCommands = commands;
+  //   });
+  // }
 
-  //Fonction filter qui sert à filtrer data en changant la valeur de l'input search
+
   void _runFilter(String enteredKeyword) {
-    print("RunFilter Methode : ${commands.length}");
     List<Commande> results = [];
-
     if (enteredKeyword.isEmpty) {
-      // If the search field is empty or only contains white-space, we'll display all users
       results = commands;
     } else {
       results = commands
           .where((command) =>
-          command.client.toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // We use the toLowerCase() method to make it case-insensitive
+          command.client.toLowerCase().contains(enteredKeyword.toLowerCase()) ||
+              command.numpiece.toLowerCase().contains(enteredKeyword.toLowerCase())
+      ).toList();
     }
-
-    // Update the _foundUsers list and trigger a rebuild
     setState(() {
       _foundCommands = results;
     }
     );
-
   }
+
 
 }
