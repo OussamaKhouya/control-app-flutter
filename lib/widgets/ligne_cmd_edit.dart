@@ -14,17 +14,20 @@ class LigneCmdEdit extends StatefulWidget {
 
 class _LigneCmdEditState extends State<LigneCmdEdit> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final ligneCmdQuantitePartielController = TextEditingController();
-  final ligneCmdQuantiteLivController = TextEditingController();
-  final ligneCmdObservationController = TextEditingController();
+  final ligneCmdQuantite1Controller = TextEditingController();
+  final ligneCmdQuantite2Controller = TextEditingController();
+  final ligneCmdObservation1Controller = TextEditingController();
+  final ligneCmdObservation2Controller = TextEditingController();
 
   String errorMessage = '';
 
   @override
   void initState() {
-    ligneCmdQuantitePartielController.text = widget.ligneC.quantitePartiel.toString();
-    ligneCmdQuantiteLivController.text = widget.ligneC.quantiteLiv.toString();
-    ligneCmdObservationController.text = widget.ligneC.observation.toString();
+    print(widget.ligneC);
+    ligneCmdQuantite1Controller.text = widget.ligneC.quantite1;
+    ligneCmdQuantite2Controller.text = widget.ligneC.quantite2;
+    ligneCmdObservation1Controller.text = widget.ligneC.observation1;
+    ligneCmdObservation2Controller.text = widget.ligneC.observation2;
 
     super.initState();
   }
@@ -41,7 +44,7 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
               Text(
                 '${widget.ligneC.numpiece} - ${widget.ligneC.numero}',
                 style:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 21,
@@ -69,30 +72,40 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                       height: 17,
                     ),
                     TextFormField(
-                      controller: ligneCmdQuantiteLivController,
+                      controller: ligneCmdQuantite1Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Quantité livrée:',
+                        labelText: 'Quantité 1:',
                       ),
                     ),
                     const SizedBox(
                       height: 15,
                     ),
                     TextFormField(
-                      controller: ligneCmdQuantitePartielController,
+                      controller: ligneCmdObservation1Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Quantité vérifiée:',
+                        labelText: 'Observation 1:',
                       ),
                     ),
                     const SizedBox(
                       height: 15,
                     ),
                     TextFormField(
-                      controller: ligneCmdObservationController,
+                      controller: ligneCmdQuantite2Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Observation:',
+                        labelText: 'Quantité 2:',
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    TextFormField(
+                      controller: ligneCmdObservation2Controller,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Observation 2:',
                       ),
                     ),
                     const SizedBox(
@@ -101,16 +114,6 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: const ButtonStyle(
-                              backgroundColor:
-                                  MaterialStatePropertyAll(Colors.grey)),
-                          child: const Text("Verrouiller"),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
                         ElevatedButton(
                           onPressed: () {
                             updateLigneC(context);
@@ -149,9 +152,11 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
     if (!form!.validate()) {
       return;
     }
-    widget.ligneC.quantitePartiel =ligneCmdQuantitePartielController.text;
-    widget.ligneC.quantiteLiv = ligneCmdQuantiteLivController.text;
-    widget.ligneC.observation = ligneCmdObservationController.text;
+    print(widget.ligneC.quantite1);
+    widget.ligneC.quantite1 = ligneCmdQuantite1Controller.text;
+    widget.ligneC.quantite2 = ligneCmdQuantite2Controller.text;
+    widget.ligneC.observation1 = ligneCmdObservation1Controller.text;
+    widget.ligneC.observation2 = ligneCmdObservation2Controller.text;
     await widget.ligneCCallback(widget.ligneC);
     Navigator.pop(context);
   }

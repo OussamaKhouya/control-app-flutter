@@ -151,7 +151,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${lignC.numpiece} - ${lignC.numero} (0_pics)',
+                                          '${lignC.numpiece} - ${lignC.numero}',
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -162,6 +162,14 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                         ),
                                         Text(
                                           lignC.designation,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),const SizedBox(
+                                          height: 8,
+                                        ),Text(
+                                          '(${lignC.nbrPhoto} photo)',
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -192,7 +200,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                           ),
                                           onTap: () async {
                                             Navigator.pushNamed(
-                                                context, '/camera');
+                                                context, '/camera', arguments:lignC);
                                           },
                                         ),
                                       ),

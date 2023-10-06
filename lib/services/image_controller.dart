@@ -66,6 +66,7 @@ class ImageController extends GetxController {
   }
 
   Future<bool> uploadImage(String numpiece,String numero, String fileName) async {
+    print("i was uploadImage");
     if(image != null){
       http.StreamedResponse response = await apiService.uploadImage(image!, numpiece,numero, fileName);
       print(response.statusCode);
@@ -75,7 +76,16 @@ class ImageController extends GetxController {
         print(message);
         return true;
       } else {
-        print("error posting the image");
+        Map body = jsonDecode(await response.stream.bytesToString());
+        print(body);
+        Map<String, dynamic> errors = body['errors'];
+        String errorMessage = '';
+        errors.forEach((key, value) {
+          value.forEach((element) {
+            errorMessage += element + '\n';
+          });
+        });
+        throw Exception(errorMessage);
       }
     }else {
       print("choose an image");

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_app/models/compte.dart';
-import 'package:flutter_app/models/image.dart';
 import 'package:flutter_app/models/ligne_c.dart';
 import 'package:http/http.dart' as http;
 
@@ -33,7 +32,7 @@ class ApiService {
       return compte;
     } else {
       // Handle error cases here if needed.
-      throw Exception('Failed to fetch Compte');
+      throw Exception('Failed to fetch compte');
     }
   }
 
@@ -47,15 +46,15 @@ class ApiService {
           HttpHeaders.authorizationHeader: 'Bearer $token'
         },
         body: jsonEncode({
-          'observation': ligne.observation,
-          'quantitePartiel': ligne.quantitePartiel,
-          'quantiteLiv': ligne.quantiteLiv,
+          'quantite1': ligne.quantite1,
+          'observation1': ligne.observation1,
+          'quantite2': ligne.quantite2,
+          'observation2': ligne.observation2,
         }));
 
     if (response.statusCode != 200) {
       throw Exception('Error happened on update');
     }
-
     return LigneC.fromJson(jsonDecode(response.body));
   }
 
@@ -134,7 +133,7 @@ class ApiService {
           'password_confirmation': passworConfirm,
           'device_name': deviceName,
         }));
-
+      print(response.statusCode);
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -200,7 +199,8 @@ class ApiService {
         'file', file.readAsBytes().asStream(), file.lengthSync(),
         filename: file.path.split('/').last));
 
-    http.StreamedResponse response = await request.send();
+    var response = await request.send();
+
     print('inside uploadImage ApiService');
     return response;
   }

@@ -6,7 +6,6 @@ import 'package:flutter_app/views/camera_screen.dart';
 import 'package:flutter_app/views/commands.dart';
 import 'package:flutter_app/views/compte_view.dart';
 import 'package:flutter_app/views/datails_cmd.dart';
-import 'package:flutter_app/views/gallery.dart';
 import 'package:flutter_app/views/login.dart';
 import 'package:flutter_app/views/register.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +60,6 @@ class MyApp extends StatelessWidget {
                 '/account': (context) => const Account(),
                 '/commands' : (context) => const Commands(),
                 '/detailsCmd' : (context) => const DetailsCmd(),
-                '/gallery' : (context) => Gallery(),
                 '/camera': (context) => CameraScreen()
                 ,
               },
