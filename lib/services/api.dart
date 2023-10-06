@@ -11,9 +11,7 @@ class ApiService {
   late String token;
   late User currUser;
 
-  ApiService(String token) {
-    this.token = token;
-  }
+  ApiService(this.token);
 
   final String baseurl = "http://192.168.1.42:4300/api";
 
@@ -58,6 +56,23 @@ class ApiService {
     return LigneC.fromJson(jsonDecode(response.body));
   }
 
+  Future<Commande> updateCommande(Commande cmd) async{
+    String uri = '$baseurl/commandes/${cmd.numpiece}';
+    http.Response response = await http.put(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+        body: jsonEncode({
+          'saisie' : 1,
+        })
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update Commande !');
+    }
+    return Commande.fromJson(jsonDecode(response.body));
+  }
 
   Future<List<Commande>> fetchCommands() async {
     http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
@@ -124,7 +139,6 @@ class ApiService {
           'password_confirmation': passworConfirm,
           'device_name': deviceName,
         }));
-      print(response.statusCode);
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -190,8 +204,8 @@ class ApiService {
         'file', file.readAsBytes().asStream(), file.lengthSync(),
         filename: file.path.split('/').last));
 
-    var response = await request.send();
-
+    http.StreamedResponse response = await request.send();
+    print('inside uploadImage ApiService');
     return response;
   }
 }

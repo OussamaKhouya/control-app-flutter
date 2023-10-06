@@ -82,15 +82,30 @@ class _DetailsCmdState extends State<DetailsCmd> {
                           elevation: 1.0,
                           // Add elevation for a button-like appearance
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(4.0),
                             // Add space around the icon
                             child: InkWell(
-                              child: const Icon(
-                                Icons.refresh,
-                                color: Colors.white,
-                              ),
+                              child: const Icon(Icons.refresh,color: Colors.white,size: 35,),
                               onTap: () {
-                                getLignCmd(provider, true);
+                                try{
+                                  getLignCmd(provider, true);
+                                }catch (exp){
+                                  print('Erreur lors de la requête API : $exp');
+                                }
+
+                                showDialog(context: context,
+                                    builder: (BuildContext context){
+                                      return AlertDialog(
+                                        title: const Text("Liste Actualisé",style: TextStyle(color: Colors.blue),),
+                                        content: const Text("La liste a été actualisée avec succès",style: TextStyle(
+                                            color: Colors.blue
+                                        ),),
+                                        actions: <Widget>[
+                                          TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("OK"),)
+                                        ],
+                                      );
+                                    }
+                                );
                               },
                             ),
                           )),
@@ -196,7 +211,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                         child: InkWell(
                                           child: const Icon(
                                             Icons.camera_alt,
-                                            color: Colors.white,
+                                            color: Colors.white,size: 30,
                                           ),
                                           onTap: () async {
                                             Navigator.pushNamed(
@@ -212,18 +227,11 @@ class _DetailsCmdState extends State<DetailsCmd> {
                           )
                         : Column(
                             children: [
-                              if (!this.showSpinner)
-                                Text(
-                                  "Aucun résultat trouvé",
-                                  style: TextStyle(fontSize: 24),
-                                )
-                              else
-                                SpinKitRing(
-                                  color: Colors.blue,
-                                  size: 50.0,
-                                ),
+                              (showSpinner)? const Text("Aucun résultat trouvé", style: TextStyle(fontSize: 24),) :
+                               const SpinKitRing(color: Colors.blue, size: 50.0,)
                             ],
-                          )),
+                          )
+                ),
               ],
             ),
           ),
@@ -242,7 +250,6 @@ class _DetailsCmdState extends State<DetailsCmd> {
       showSpinner = false;
     }
     LigneCommands = provider.ligne_commands;
-
     inputSearch.clear();
     _runFilter('');
     setState(() {
@@ -253,18 +260,17 @@ class _DetailsCmdState extends State<DetailsCmd> {
   void _runFilter(String enteredKeyword) {
     List<LigneC> results = [];
     if (enteredKeyword.isEmpty) {
-      // If the search field is empty or only contains white-space, we'll display all users
       results = LigneCommands;
     } else {
       results = LigneCommands.where((ligneC) => ligneC.designation
           .toLowerCase()
           .contains(enteredKeyword.toLowerCase())).toList();
-      // We use the toLowerCase() method to make it case-insensitive
     }
-
-    // Update the _foundLigneCmd list and trigger a rebuild
     setState(() {
       _foundLigneCmd = results;
-    });
+    }
+    );
   }
+
+
 }

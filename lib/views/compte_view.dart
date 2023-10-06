@@ -19,7 +19,7 @@ class Account extends StatelessWidget {
       body:  SingleChildScrollView(
         child:  Center(
           child: Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(10),
             child:   Column(
               children: [
                 const SizedBox(height: 50,),
