@@ -77,7 +77,8 @@ class _CameraScreenState extends State<CameraScreen> {
                                   setState(() {
                                     imageSelected=true;
                                   });
-                                }),
+                                }
+                                ),
 
                           ],
                         ),

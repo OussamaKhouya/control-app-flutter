@@ -36,5 +36,4 @@ class LigneCProvider extends ChangeNotifier{
     return await apiService.getImagesUrl(numpiece, numero);
   }
 
-
 }

@@ -8,7 +8,7 @@ class Commande {
   int commercial;
   int control1;
   int control2;
-
+  //int ver;
   Commande({
     required this.numpiece,
     required this.date,
@@ -17,7 +17,8 @@ class Commande {
     required this.saisie,
     required this.commercial,
     required this.control1,
-    required this.control2
+    required this.control2,
+   // required this.ver,
   });
 
   factory Commande.fromJson(Map<String, dynamic> json) {
@@ -26,6 +27,7 @@ class Commande {
         client : json['client'], etat : json['etat'],
         saisie : json['saisie'], commercial : json['commercial'],
         control1 : json['control1'], control2 : json['control2'],
+       // ver: json['ver']
     );
   }
 

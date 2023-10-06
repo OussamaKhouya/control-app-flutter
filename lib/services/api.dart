@@ -11,11 +11,9 @@ import '../models/commande.dart';
 class ApiService {
   late String token;
 
-  ApiService(String token) {
-    this.token = token;
-  }
+  ApiService(this.token);
 
-  final String baseurl = "http://192.168.1.42:4300/api";
+  final String baseurl = "http://192.168.1.100:4300/api";
 
 
   Future<Compte> fetchCompte() async {
@@ -50,7 +48,8 @@ class ApiService {
           'observation': ligne.observation,
           'quantitePartiel': ligne.quantitePartiel,
           'quantiteLiv': ligne.quantiteLiv,
-        }));
+        })
+    );
 
     if (response.statusCode != 200) {
       throw Exception('Error happened on update');
@@ -59,6 +58,23 @@ class ApiService {
     return LigneC.fromJson(jsonDecode(response.body));
   }
 
+  Future<Commande> updateCommande(Commande cmd) async{
+    String uri = '$baseurl/commandes/${cmd.numpiece}';
+    http.Response response = await http.put(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+        body: jsonEncode({
+          'saisie' : 1,
+        })
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update Commande !');
+    }
+    return Commande.fromJson(jsonDecode(response.body));
+  }
 
   Future<List<Commande>> fetchCommands() async {
     http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
@@ -95,6 +111,7 @@ class ApiService {
       throw Exception(errorMessage);
     }
   }
+
 
   Future<List<LigneC>> fetchLigneC1() async {
     http.Response response =

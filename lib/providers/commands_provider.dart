@@ -15,12 +15,22 @@ class CommandProvider extends ChangeNotifier {
     init();
   }
 
+  Future<void> updateCommande(Commande Cmd) async {
+    try {
+      await apiService.updateCommande(Cmd);
+      notifyListeners();
+    } catch (Exception) {
+      print(Exception);
+    }
+  }
+
   Future init() async {
     await fetchCommands();
   }
 
-  Future<void> fetchCommands() async {
+  Future<List<Commande>> fetchCommands() async {
     commands = await apiService.fetchCommands();
     notifyListeners();
+    return commands;
   }
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/models/compte.dart';
 import 'package:flutter_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
-
 import '../providers/compte_provider.dart';
+
 class Account extends StatelessWidget {
   const Account({super.key});
 
@@ -19,7 +19,7 @@ class Account extends StatelessWidget {
       body:  SingleChildScrollView(
         child:  Center(
           child: Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(10),
             child:   Column(
               children: [
                 const SizedBox(height: 50,),
@@ -33,7 +33,7 @@ class Account extends StatelessWidget {
                 Card(
                   color: Colors.blue,
                   child: Container(
-                    padding: const EdgeInsets.all(30) ,
+                    padding: const EdgeInsets.all(20) ,
                     child: SizedBox(
                       width: 500,
                      // height: 100,
