@@ -9,7 +9,6 @@ import 'package:flutter_app/views/datails_cmd.dart';
 import 'package:flutter_app/views/login.dart';
 import 'package:flutter_app/views/register.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_app/providers/compte_provider.dart';
 
 
 
@@ -34,11 +33,7 @@ class MyApp extends StatelessWidget {
               ),
               ChangeNotifierProvider<LigneCProvider>(
                 create: (context) => LigneCProvider(authProvider),
-              ),
-              ChangeNotifierProvider<CompteProvider>(
-                create: (context) => CompteProvider(authProvider),
               )
-
             ],
             child: MaterialApp(
               title: 'Application Flutter de control de preparation des commandes',

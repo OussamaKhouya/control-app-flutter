@@ -61,15 +61,19 @@ dev_dependencies:
   flutter_native_splash: ^2.0.1+1
 
 flutter_native_splash:
-  color : "#ffffff"
-  image : assets/COMMERCIAL.png
+  color : "#448aff"
+  image : assets/img/splash.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/COMMERCIAL.png
+    - assets/img/admin.png
+    - assets/img/commercial.png
+    - assets/img/control1.png
+    - assets/img/control2.png
+    - assets/img/noRole.png
   #  - assets/img1.jpg
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

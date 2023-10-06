@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_app/models/compte.dart';
+import 'package:flutter_app/models/user.dart';
 import 'package:flutter_app/models/ligne_c.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,6 +9,7 @@ import '../models/commande.dart';
 
 class ApiService {
   late String token;
+  late User currUser;
 
   ApiService(String token) {
     this.token = token;
@@ -17,7 +18,7 @@ class ApiService {
   final String baseurl = "http://192.168.1.42:4300/api";
 
 
-  Future<Compte> fetchCompte() async {
+  Future<User> getuserInfo() async {
     http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -27,12 +28,11 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> compteData = jsonDecode(response.body);
-      Compte compte = Compte.fromJson(compteData);
-      return compte;
+      User user = User.fromJson(jsonDecode(response.body));
+      return user;
     } else {
       // Handle error cases here if needed.
-      throw Exception('Failed to fetch compte');
+      throw Exception('Failed to fetch user info');
     }
   }
 
@@ -95,15 +95,6 @@ class ApiService {
     }
   }
 
-  Future<List<LigneC>> fetchLigneC1() async {
-    http.Response response =
-    await http.get(Uri.parse('$baseurl/ligne-commandes'), headers: {
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.authorizationHeader: 'Bearer $token'
-    });
-    List ligneCmd = jsonDecode(response.body);
-    return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
-  }
 
   Future<List<String>> getImagesUrl(String numpiece, String numero) async {
     http.Response response =
@@ -116,7 +107,7 @@ class ApiService {
     return imageUrls.map((element) => element.toString()).toList();
   }
 
-  Future<String> register(String name, String username, String role,
+  Future<Map<String, dynamic>> register(String name, String username, String role,
       String password, String passworConfirm, String deviceName) async {
    String uri = '$baseurl/auth/register';
 
@@ -135,7 +126,7 @@ class ApiService {
         }));
       print(response.statusCode);
     if (response.statusCode == 200) {
-      return response.body;
+      return jsonDecode(response.body);
     } else {
       Map<String, dynamic> body = jsonDecode(response.body);
       print(body);
@@ -150,7 +141,7 @@ class ApiService {
     }
   }
 
-  Future<String> login(String username, String password, String deviceName) async {
+  Future<Map<String, dynamic>> login(String username, String password, String deviceName) async {
     String uri = '$baseurl/auth/login';
 
     http.Response response = await http.post(Uri.parse(uri),
@@ -165,7 +156,7 @@ class ApiService {
         }));
 
     if (response.statusCode == 200) {
-      return response.body;
+      return jsonDecode(response.body);
     } else {
       Map<String, dynamic> body = jsonDecode(response.body);
       Map<String, dynamic> errors = body['errors'];
@@ -201,7 +192,6 @@ class ApiService {
 
     var response = await request.send();
 
-    print('inside uploadImage ApiService');
     return response;
   }
 }

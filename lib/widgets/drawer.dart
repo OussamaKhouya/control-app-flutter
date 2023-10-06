@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
 
-import '../models/compte.dart';
-import '../providers/compte_provider.dart';
+import '../models/user.dart';
 
 
 class MyDrawer extends StatelessWidget {
@@ -13,36 +12,47 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CompteProvider>(context);
-    Compte compte = provider.compte;
+    final provider = Provider.of<AuthProvider>(context);
+    User currUser = provider.currUser;
     return  Drawer(
       semanticLabel: "Menu",
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.blueAccent,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  backgroundImage: AssetImage("assets/${compte.role}.png"),
-                  // Adjust the size of the CircleAvatar if needed
-                  radius: 50, // Change this radius as desired
-                ),
-                const SizedBox(height: 8), // Add some space between the image and text
-                Text(
-                  "${compte.role} : ${compte.name}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18, // Adjust the font size as desired
-                  ),
-                ),
-              ],
-            ),
-          )
+           SizedBox(
+             height: 220,
+             child: DrawerHeader(
+                 decoration: const BoxDecoration(
+                   color: Colors.blueAccent,
+                 ),
+                 child: SingleChildScrollView(
+                   child: Column(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       CircleAvatar(
+                         backgroundImage: AssetImage("assets/img/${currUser.role.toLowerCase()}.png"),
+                         // Adjust the size of the CircleAvatar if needed
+                         radius: 50, // Change this radius as desired
+                       ),
+                       const SizedBox(height: 8), // Add some space between the image and text
+                       Text(
+                         "${currUser.name}",
+                         style: const TextStyle(
+                           color: Colors.white,
+                           fontSize: 18, // Adjust the font size as desired
+                         ),
+                       ),// Add some space between the image and text
+                       Text(
+                         "${currUser.role.toLowerCase()}",
+                         style: const TextStyle(
+                           color: Colors.white,
+                           fontSize: 18, // Adjust the font size as desired
+                         ),
+                       ),
+                     ],
+                   ),)
+             ),
+           )
           ,
           const Divider(),
           ListTile(
@@ -63,9 +73,9 @@ class MyDrawer extends StatelessWidget {
           ),
 
           ListTile(
-            title: const Text("Deconexion"),
-            onTap: (){
-              logout(context);
+            title: const Text("Se déconnecter"),
+            onTap: () async {
+              await provider.logOut();
             },
             leading: const Icon(Icons.logout),
           ),
@@ -74,10 +84,4 @@ class MyDrawer extends StatelessWidget {
     );
   }
 
-  Future<void> logout(context) async {
-    final AuthProvider provider =
-    Provider.of<AuthProvider>(context, listen: false);
-
-    await provider.logOut();
-  }
 }

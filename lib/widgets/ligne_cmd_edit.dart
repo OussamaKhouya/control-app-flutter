@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/models/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_app/providers/auth_provider.dart';
 
+import '../models/user.dart';
 import '../models/ligne_c.dart';
 
 class LigneCmdEdit extends StatefulWidget {
@@ -23,7 +27,6 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
 
   @override
   void initState() {
-    print(widget.ligneC);
     ligneCmdQuantite1Controller.text = widget.ligneC.quantite1;
     ligneCmdQuantite2Controller.text = widget.ligneC.quantite2;
     ligneCmdObservation1Controller.text = widget.ligneC.observation1;
@@ -34,6 +37,9 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
 
   @override
   Widget build(BuildContext context) {
+
+    getPermissions();
+
     return SafeArea(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.97,
@@ -71,43 +77,43 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                     const SizedBox(
                       height: 17,
                     ),
-                    TextFormField(
+                    Visibility(visible: showQ1, child: TextFormField(
                       controller: ligneCmdQuantite1Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Quantité 1:',
                       ),
-                    ),
+                    )),
                     const SizedBox(
                       height: 15,
                     ),
-                    TextFormField(
+                    Visibility(visible: showObs1, child:TextFormField(
                       controller: ligneCmdObservation1Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Observation 1:',
                       ),
-                    ),
+                    )),
                     const SizedBox(
                       height: 15,
                     ),
-                    TextFormField(
+                    Visibility(visible: showQ2, child:TextFormField(
                       controller: ligneCmdQuantite2Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Quantité 2:',
                       ),
-                    ),
+                    )),
                     const SizedBox(
                       height: 15,
                     ),
-                    TextFormField(
+                    Visibility(visible: showObs2, child:TextFormField(
                       controller: ligneCmdObservation2Controller,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Observation 2:',
                       ),
-                    ),
+                    )),
                     const SizedBox(
                       height: 15,
                     ),
@@ -159,5 +165,20 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
     widget.ligneC.observation2 = ligneCmdObservation2Controller.text;
     await widget.ligneCCallback(widget.ligneC);
     Navigator.pop(context);
+  }
+
+  late bool showQ1, showQ2, showObs1, showObs2;
+  void getPermissions(){
+    final provider = Provider.of<AuthProvider>(context);
+    String role = provider.currUser.role;
+
+    showQ1 = false; showQ2 = false; showObs1 = false; showObs2 = false;
+
+    if (role == RoleConstants.control1) {
+      showQ1 = true; showQ2 = false; showObs1 = true; showObs2 = false;
+    }
+    if (role == RoleConstants.control2) {
+      showQ1 = false; showQ2 = true; showObs1 = false; showObs2 = true;
+    }
   }
 }
