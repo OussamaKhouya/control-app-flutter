@@ -38,9 +38,8 @@ class Account extends StatelessWidget {
                       width: 500,
                      // height: 100,
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                        //scrollDirection: Axis.horizontal,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Row(
                               children: [

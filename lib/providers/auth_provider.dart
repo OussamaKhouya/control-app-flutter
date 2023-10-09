@@ -18,8 +18,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> init() async {
     token = await getToken();
-    currUser = await getUser();
     if (token.isNotEmpty) {
+      currUser = await getUser();
       isAuthenticated = true;
     }
     apiService = ApiService(token);
@@ -33,7 +33,7 @@ class AuthProvider extends ChangeNotifier {
     token = user['token'];
     setToken(token);
     currUser = User(name: user['name'], username: user['username'], role: user['role']);
-        setUser(currUser);
+    setUser(currUser);
     isAuthenticated = true;
     notifyListeners();
   }
@@ -83,11 +83,13 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     late User user;
     try {
-      Map<String,dynamic> userMap = jsonDecode(prefs.getString('user')?? '') as Map<String, dynamic>;
+       Map<String,dynamic> userMap = jsonDecode(prefs.getString('user')?? '') as Map<String, dynamic>;
        user = User.fromJson(userMap);
       } catch (e) {
-      print('Error decoding JSON: $e');
+        print('Error decoding JSON: $e');
       }
     return user;
   }
+
+
 }

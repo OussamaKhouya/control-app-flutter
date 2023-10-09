@@ -20,7 +20,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
   // This list holds the data for the list view
   List<LigneC> _foundLigneCmd = [];
-
+  bool onlyOnce = true;
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LigneCProvider>(context);
@@ -88,7 +88,9 @@ class _DetailsCmdState extends State<DetailsCmd> {
                               child: const Icon(Icons.refresh,color: Colors.white,size: 35,),
                               onTap: () {
                                 try{
+                                  onlyOnce=true;
                                   getLignCmd(provider, true);
+                                  inputSearch.clear();
                                 }catch (exp){
                                   print('Erreur lors de la requête API : $exp');
                                 }
@@ -244,17 +246,15 @@ class _DetailsCmdState extends State<DetailsCmd> {
 
   void getLignCmd(LigneCProvider provider, dbCall) async {
     numpiece = ModalRoute.of(context)?.settings.arguments as String;
-    if (dbCall) {
-      showSpinner = true;
-      LigneCommands = await provider.fetchLigneC(numpiece);
-      showSpinner = false;
-    }
-    LigneCommands = provider.ligne_commands;
-    inputSearch.clear();
-    _runFilter('');
-    setState(() {
+    if(onlyOnce){
+      if (dbCall) {
+        showSpinner = true;
+        LigneCommands = await provider.fetchLigneC(numpiece);
+        showSpinner = false;
+      }
+      LigneCommands = provider.ligne_commands;
       _foundLigneCmd = LigneCommands;
-    });
+    }
   }
 
   void _runFilter(String enteredKeyword) {
@@ -267,6 +267,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
           .contains(enteredKeyword.toLowerCase())).toList();
     }
     setState(() {
+       onlyOnce=false;
       _foundLigneCmd = results;
     }
     );

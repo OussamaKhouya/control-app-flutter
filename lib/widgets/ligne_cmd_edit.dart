@@ -10,7 +10,7 @@ class LigneCmdEdit extends StatefulWidget {
   final LigneC ligneC;
   final Function ligneCCallback;
 
-  LigneCmdEdit(this.ligneC, this.ligneCCallback, {Key? key}) : super(key: key);
+  const LigneCmdEdit(this.ligneC, this.ligneCCallback, {Key? key}) : super(key: key);
 
   @override
   _LigneCmdEditState createState() => _LigneCmdEditState();
