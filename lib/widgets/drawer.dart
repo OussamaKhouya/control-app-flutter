@@ -71,11 +71,13 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(Icons.list),
 
           ),
-
           ListTile(
             title: const Text("Se déconnecter"),
             onTap: () async {
-              await provider.logOut();
+              bool flag = await provider.logOut();
+              if(flag){
+                Navigator.pushNamed(context, "/login");
+              }
             },
             leading: const Icon(Icons.logout),
           ),

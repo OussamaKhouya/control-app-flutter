@@ -159,7 +159,7 @@ class _RegisterState extends State<Register> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text('<- Retour à la page de connexion'),
+                                    child: const Text('<- Retour à la page de connexion'),
                                   ),
                                 )
                               ],

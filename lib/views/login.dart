@@ -43,9 +43,9 @@ class _LoginState extends State<Login> {
             children: <Widget>[
               Card(
                 elevation: 8,
-                margin: EdgeInsets.only(left: 16.0, right: 16.0),
+                margin: const EdgeInsets.only(left: 16.0, right: 16.0),
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Form(
                       key: _formKey,
                       child: Column(
@@ -82,7 +82,6 @@ class _LoginState extends State<Login> {
                               },
                               )
                             ),
-
                           ),
                           ElevatedButton(
                             onPressed: () => submit(),
@@ -92,15 +91,6 @@ class _LoginState extends State<Login> {
                           ),
                           Text(errorMessage,
                               style: TextStyle(color: Colors.red)),
-                          Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/register');
-                              },
-                              child: Text('Créer un nouveau utilisateur'),
-                            ),
-                          )
                         ],
                       )),
                 ),
@@ -117,15 +107,23 @@ class _LoginState extends State<Login> {
     }
 
     final AuthProvider provider = Provider.of<AuthProvider>(context, listen: false);
+    showSpinnerDialog(context);
     try {
-      await provider.login(
+
+     bool isAuth = await provider.login(
           usernameController.text,
           passwordController.text,
           deviceName);
+     if(isAuth) {
+       Navigator.pushNamed(context, "/commands");
+     }else {
+       closeSpinnerDialog();
+     }
     } catch (Exception) {
       setState(() {
         errorMessage = Exception.toString().replaceAll('Exception:', '');
       });
+      closeSpinnerDialog();
     }
   }
 
@@ -149,4 +147,22 @@ class _LoginState extends State<Login> {
       });
     }
   }
+
+  showSpinnerDialog(BuildContext context){
+    AlertDialog alert=AlertDialog(
+      content: Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(margin: EdgeInsets.only(left: 5),child:Text(" Chargement",style: TextStyle(color: Colors.blue))),
+        ],),
+    );
+    showDialog(barrierDismissible: false,
+      context:context,
+      builder:(BuildContext context){
+        return alert;
+      },
+    );
+  }
+
+  closeSpinnerDialog(){Navigator.of(context).pop();}
 }

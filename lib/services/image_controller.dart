@@ -21,16 +21,18 @@ class ImageController extends GetxController {
 
   File? image;
 
-  Future<void> saveImage() async {
+  Future<String> saveImage() async {
     try {
       final Directory? appDirectory = await getExternalStorageDirectory();
       final String imageDirectory = '${appDirectory?.path}/images';
       await Directory(imageDirectory).create(recursive: true);
 
-      String imagePath = '$imageDirectory/image_${DateTime.now()}.jpg';
+      // String imagePath = '$imageDirectory/image_${DateTime.now()}.jpg';
+      String imagePath = '$imageDirectory/image_to_upload.jpg';
       if (image != null) {
         File capturedFile = File(image!.path);
         await capturedFile.copy(imagePath!);
+        return imagePath;
       } else {
         print("image is null");
       }
@@ -38,6 +40,7 @@ class ImageController extends GetxController {
     } catch (e) {
       print('Error taking photo: $e');
     }
+    return "";
   }
 
 
@@ -55,38 +58,46 @@ class ImageController extends GetxController {
 
   Future pickImageCamera() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      final image = await ImagePicker().getImage(source: ImageSource.camera);
       if (image == null) return;
       final imageTemp = File(image.path);
-      this.image = imageTemp;
+      print(await imageTemp.length());
+      this.image = File(imageTemp.path);
       update();
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
     }
   }
 
-  Future<bool> uploadImage(String numpiece,String numero, String fileName) async {
-    print("i was uploadImage");
-    if(image != null){
-      http.StreamedResponse response = await apiService.uploadImage(image!, numpiece,numero, fileName);
-      print(response.statusCode);
-      if (response.statusCode == 201) {
-        Map map = jsonDecode(await response.stream.bytesToString());
-        String message = map["message"];
-        print(message);
-        return true;
-      } else {
-        Map body = jsonDecode(await response.stream.bytesToString());
-        print(body);
-        Map<String, dynamic> errors = body['errors'];
-        String errorMessage = '';
-        errors.forEach((key, value) {
-          value.forEach((element) {
-            errorMessage += element + '\n';
+  Future<bool> uploadImage(String numpiece,String numero, String fileName,File file) async {
+    if(file != null){
+      var len = await file.length();
+      print("len");
+      print(len);
+      if(len != 0){
+        http.StreamedResponse response = await apiService.uploadImage2(file, numpiece,numero, fileName);
+        print(response.statusCode);
+        if (response.statusCode == 201) {
+          Map map = jsonDecode(await response.stream.bytesToString());
+          String message = map["message"];
+          print(message);
+          return true;
+        } else {
+          Map body = jsonDecode(await response.stream.bytesToString());
+          print(body);
+          Map<String, dynamic> errors = body['error'];
+          String errorMessage = '';
+          errors.forEach((key, value) {
+            value.forEach((element) {
+              errorMessage += element + '\n';
+            });
           });
-        });
-        throw Exception(errorMessage);
+          throw Exception(errorMessage);
+        }
+      }else {
+        print("image length is zero!");
       }
+
     }else {
       print("choose an image");
     }

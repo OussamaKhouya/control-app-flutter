@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/models/ligne_c.dart';
+import 'package:flutter_app/models/constants.dart';
+import 'package:flutter_app/models/lcmd.dart';
+import 'package:flutter_app/providers/auth_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/ligne_commande_provider.dart';
+import '../providers/lcmd_provider.dart';
 import '../widgets/ligne_cmd_edit.dart';
 
 class DetailsCmd extends StatefulWidget {
@@ -14,21 +16,30 @@ class DetailsCmd extends StatefulWidget {
 }
 
 class _DetailsCmdState extends State<DetailsCmd> {
-  List<LigneC> LigneCommands = [];
+  List<LCmd> LigneCommands = [];
   String numpiece = '';
   final inputSearch = TextEditingController();
+  String? UPLOAD_IMG_INITIALS;
+  int imageCount = 0;
 
   // This list holds the data for the list view
-  List<LigneC> _foundLigneCmd = [];
+  List<LCmd> _foundLigneCmd = [];
   bool onlyOnce = true;
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<LigneCProvider>(context);
+    final provider = Provider.of<LCmdProvider>(context);
     getLignCmd(provider, false);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détails de Commande'),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context,true)
+          )
       ),
       // drawer: const MyDrawer( popCmd: false,popAccount: false,),
       body: SafeArea(
@@ -41,7 +52,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                   height: 35,
                 ),
                 Text(
-                  "${LigneCommands.length} Articles de Commande: $numpiece",
+                  "${LigneCommands.length} articles dans: $numpiece",
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
@@ -85,29 +96,15 @@ class _DetailsCmdState extends State<DetailsCmd> {
                             padding: const EdgeInsets.all(4.0),
                             // Add space around the icon
                             child: InkWell(
-                              child: const Icon(Icons.refresh,color: Colors.white,size: 35,),
+                              child: const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                                size: 35,
+                              ),
                               onTap: () {
-                                try{
-                                  onlyOnce=true;
-                                  getLignCmd(provider, true);
-                                  inputSearch.clear();
-                                }catch (exp){
-                                  print('Erreur lors de la requête API : $exp');
-                                }
-
-                                showDialog(context: context,
-                                    builder: (BuildContext context){
-                                      return AlertDialog(
-                                        title: const Text("Liste Actualisé",style: TextStyle(color: Colors.blue),),
-                                        content: const Text("La liste a été actualisée avec succès",style: TextStyle(
-                                            color: Colors.blue
-                                        ),),
-                                        actions: <Widget>[
-                                          TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("OK"),)
-                                        ],
-                                      );
-                                    }
-                                );
+                                onlyOnce = true;
+                                getLignCmd(provider, true);
+                                inputSearch.clear();
                               },
                             ),
                           )),
@@ -122,12 +119,13 @@ class _DetailsCmdState extends State<DetailsCmd> {
                         ? ListView.builder(
                             itemCount: _foundLigneCmd.length,
                             itemBuilder: (context, index) {
-                              LigneC lignC = _foundLigneCmd[index];
+                              LCmd lignC = _foundLigneCmd[index];
+                              getPermissions(authProvider, lignC);
                               return Card(
                                 shape: const RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
-                                key: ValueKey(lignC.numpiece),
+                                key: ValueKey(lignC.a_bcc_nupi),
                                 elevation: 4,
                                 margin:
                                     const EdgeInsets.symmetric(vertical: 10),
@@ -168,7 +166,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${lignC.numpiece} - ${lignC.numero}',
+                                          '${lignC.a_bcc_nupi} - ${lignC.a_bcc_num}',
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -178,15 +176,17 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                           height: 8,
                                         ),
                                         Text(
-                                          lignC.designation,
+                                          lignC.a_bcc_lib,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                           ),
-                                        ),const SizedBox(
+                                        ),
+                                        const SizedBox(
                                           height: 8,
-                                        ),Text(
-                                          '(${lignC.nbrPhoto} photo)',
+                                        ),
+                                        Text(
+                                          '($imageCount photo)',
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -196,7 +196,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    "Quantité: ${lignC.quantite}",
+                                    "Quantité: ${lignC.a_bcc_qua}",
                                     style: const TextStyle(
                                         color: Colors.white,
                                         // Subtitle color for readability
@@ -213,11 +213,13 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                         child: InkWell(
                                           child: const Icon(
                                             Icons.camera_alt,
-                                            color: Colors.white,size: 30,
+                                            color: Colors.white,
+                                            size: 30,
                                           ),
                                           onTap: () async {
                                             Navigator.pushNamed(
-                                                context, '/camera', arguments:lignC);
+                                                context, '/camera',
+                                                arguments: lignC);
                                           },
                                         ),
                                       ),
@@ -229,11 +231,17 @@ class _DetailsCmdState extends State<DetailsCmd> {
                           )
                         : Column(
                             children: [
-                              (showSpinner)? const Text("Aucun résultat trouvé", style: TextStyle(fontSize: 24),) :
-                               const SpinKitRing(color: Colors.blue, size: 50.0,)
+                              (showSpinner)
+                                  ? const Text(
+                                      "Aucun résultat trouvé",
+                                      style: TextStyle(fontSize: 24),
+                                    )
+                                  : const SpinKitRing(
+                                      color: Colors.blue,
+                                      size: 50.0,
+                                    )
                             ],
-                          )
-                ),
+                          )),
               ],
             ),
           ),
@@ -242,14 +250,50 @@ class _DetailsCmdState extends State<DetailsCmd> {
     );
   }
 
+  void getPermissions(authProvider, LCmd lcmd) {
+
+    Map<String, dynamic> permissions = authProvider.permissions;
+
+    UPLOAD_IMG_INITIALS = permissions[PermConstants.UPLOAD_IMG_INITIALS]!;
+
+      if(UPLOAD_IMG_INITIALS == "c1"){
+        imageCount = int.parse(lcmd.nph1);
+      }else if(UPLOAD_IMG_INITIALS == "c2"){
+        imageCount = int.parse(lcmd.nph2);
+      }else {
+        imageCount = int.parse(lcmd.nph1) + int.parse(lcmd.nph2);
+      }
+
+  }
+
+  showSpinnerDialog(BuildContext context){
+    AlertDialog alert=AlertDialog(
+      content: Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(margin: EdgeInsets.only(left: 5),child:Text(" Chargement",style: TextStyle(color: Colors.blue))),
+        ],),
+    );
+    showDialog(barrierDismissible: false,
+      context:context,
+      builder:(BuildContext context){
+        return alert;
+      },
+    );
+  }
+
+  closeSpinnerDialog(){Navigator.of(context).pop();}
+
   bool showSpinner = false;
 
-  void getLignCmd(LigneCProvider provider, dbCall) async {
+  void getLignCmd(LCmdProvider provider, dbCall) async {
     numpiece = ModalRoute.of(context)?.settings.arguments as String;
-    if(onlyOnce){
+    if (onlyOnce) {
       if (dbCall) {
         showSpinner = true;
+        showSpinnerDialog(context);
         LigneCommands = await provider.fetchLigneC(numpiece);
+        closeSpinnerDialog();
         showSpinner = false;
       }
       LigneCommands = provider.ligne_commands;
@@ -258,20 +302,17 @@ class _DetailsCmdState extends State<DetailsCmd> {
   }
 
   void _runFilter(String enteredKeyword) {
-    List<LigneC> results = [];
+    List<LCmd> results = [];
     if (enteredKeyword.isEmpty) {
       results = LigneCommands;
     } else {
-      results = LigneCommands.where((ligneC) => ligneC.designation
+      results = LigneCommands.where((ligneC) => ligneC.a_bcc_lib
           .toLowerCase()
           .contains(enteredKeyword.toLowerCase())).toList();
     }
     setState(() {
-       onlyOnce=false;
+      onlyOnce = false;
       _foundLigneCmd = results;
-    }
-    );
+    });
   }
-
-
 }

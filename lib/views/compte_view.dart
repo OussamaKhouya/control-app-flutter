@@ -10,36 +10,34 @@ class Account extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      final provider = Provider.of<AuthProvider>(context);
-      User currUser = provider.currUser;
+     User currUser = provider.currUser;
     return  Scaffold(
       appBar: AppBar(
         title: const Text("Mon Compte"),
       ),
       drawer: const MyDrawer( popCmd: false,popAccount: true,),
       body:  SingleChildScrollView(
-        child:  Center(
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            child:   Column(
-              children: [
-                const SizedBox(height: 50,),
-                 CircleAvatar(
-                  backgroundImage: AssetImage("assets/img/${currUser.role.toLowerCase()}.png"),
-                  radius: 50,
-                ),
-                const SizedBox(height: 20,),
-                const Text("Mes informations personnelles",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.blue),),
-                const SizedBox(height: 20,),
-                Card(
-                  color: Colors.blue,
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 10, right: 10,top: 20,bottom: 20) ,
-                    child: SizedBox(
+        child:  Container(
+          padding: const EdgeInsets.all(10),
+          child:   Column(
+            children: [
+              const SizedBox(height: 50),
+              CircleAvatar(
+                backgroundImage: AssetImage("assets/img/${currUser.role.toLowerCase()}.png"),
+                radius: 50,
+              ),
+              const SizedBox(height: 20,),
+              Card(
+                color: Colors.blue,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 10, right: 10,top: 20,bottom: 20) ,
+                  child: SizedBox(
                       width: 500,
-                     // height: 100,
+                      // height: 100,
                       child: SingleChildScrollView(
-                        //scrollDirection: Axis.horizontal,
+                        scrollDirection: Axis.horizontal,
                         child: Column(
+                          crossAxisAlignment : CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
@@ -53,7 +51,7 @@ class Account extends StatelessWidget {
                               children: [
                                 const Icon(Icons.verified_user,color: Colors.white),
                                 const SizedBox(width: 10,),
-                                Text("Nom d'utilisateur : ${currUser.username}",style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17)),
+                                Text("Identifiant : ${currUser.username}",style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17)),
                               ],
                             ),
                             const SizedBox(height: 15,),
@@ -65,15 +63,14 @@ class Account extends StatelessWidget {
                               ],
                             ),
                           ],
-                        ),
+                        )
                       )
-                    ),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
-        ),
+        )
       ),
     );
   }

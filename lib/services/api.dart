@@ -1,130 +1,56 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:async';
 import 'package:flutter_app/models/user.dart';
-import 'package:flutter_app/models/ligne_c.dart';
+import 'package:flutter_app/models/lcmd.dart';
 import 'package:http/http.dart' as http;
-
-import '../models/commande.dart';
+import '../models/cmd.dart';
 
 class ApiService {
   late String token;
+  bool showSpinner = false;
   late User currUser;
 
   ApiService(this.token);
 
-  final String baseurl = "http://192.168.1.100:4300/api";
+  final String baseurl = "http://192.168.1.6:4300/api";
 
 
-  Future<User> getuserInfo() async {
-    http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
+  // user
+  Future<Map<String, dynamic>> login(String username, String password, String deviceName) async {
+    String uri = '$baseurl/auth/login';
+
+    http.Response response = await http.post(Uri.parse(uri),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $token'
-        }
-    );
-
-    if (response.statusCode == 200) {
-      User user = User.fromJson(jsonDecode(response.body));
-      return user;
-    } else {
-      // Handle error cases here if needed.
-      throw Exception('Failed to fetch user info');
-    }
-  }
-
-  Future<LigneC> updateLignCmd(LigneC ligne) async {
-    String uri = '$baseurl/ligne-commandes/${ligne.numero}';
-
-    http.Response response = await http.put(Uri.parse(uri),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $token'
         },
         body: jsonEncode({
-          'quantite1': ligne.quantite1,
-          'observation1': ligne.observation1,
-          'quantite2': ligne.quantite2,
-          'observation2': ligne.observation2,
+          'username': username,
+          'password': password,
+          'device_name': deviceName,
         }));
 
-    if (response.statusCode != 200) {
-      throw Exception('Error happened on update');
-    }
-    return LigneC.fromJson(jsonDecode(response.body));
-  }
 
-  Future<Commande> updateCommande(Commande cmd) async{
-    String uri = '$baseurl/commandes/${cmd.numpiece}';
-    http.Response response = await http.put(Uri.parse(uri),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $token'
-        },
-        body: jsonEncode({
-          'saisie' : 1,
-        })
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Error happened on update Commande !');
-    }
-    return Commande.fromJson(jsonDecode(response.body));
-  }
-
-  Future<List<Commande>> fetchCommands() async {
-    http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.authorizationHeader: 'Bearer $token'
-        });
-    List commandes = jsonDecode(response.body);
-    return commandes.map((commande) => Commande.fromJson(commande)).toList();
-  }
-
-  Future<List<LigneC>> fetchLigneC(String numpiece) async {
-    http.Response response = await http.post(Uri.parse('$baseurl/ligne-commandes/search'),
-            headers: {
-              HttpHeaders.contentTypeHeader: 'application/json', //important
-              HttpHeaders.acceptHeader: 'application/json',
-              HttpHeaders.authorizationHeader: 'Bearer $token'
-            },
-            body: jsonEncode({
-              'numpiece': numpiece,
-            })
-        );
-    print(numpiece);
-    print(response.statusCode);
     if (response.statusCode == 200) {
-      List ligneCmd = jsonDecode(response.body);
-      if(ligneCmd.isEmpty){
-        return [];
-      }
-      return ligneCmd.map((ligneC) => LigneC.fromJson(ligneC)).toList();
+      return jsonDecode(response.body);
     } else {
-      String errorMessage = 'no data found';
+      Map<String, dynamic> body = jsonDecode(response.body);
+      Map<String, dynamic> errors = body['errors'];
+      String errorMessage = '';
+      errors.forEach((key, value) {
+        value.forEach((element) {
+          errorMessage += element + '\n';
+        });
+      });
       throw Exception(errorMessage);
     }
-  }
 
-
-  Future<List<String>> getImagesUrl(String numpiece, String numero) async {
-    http.Response response =
-    await http.get(Uri.parse('$baseurl/file/check/$numpiece/$numero'), headers: {
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.authorizationHeader: 'Bearer $token'
-    });
-    List imageUrls = jsonDecode(response.body);
-
-    return imageUrls.map((element) => element.toString()).toList();
   }
 
   Future<Map<String, dynamic>> register(String name, String username, String role,
       String password, String passworConfirm, String deviceName) async {
-   String uri = '$baseurl/auth/register';
+    String uri = '$baseurl/auth/register';
 
     http.Response response = await http.post(Uri.parse(uri),
         headers: {
@@ -155,33 +81,121 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> login(String username, String password, String deviceName) async {
-    String uri = '$baseurl/auth/login';
+  // Future<User> getuserInfo() async {
+  //   http.Response response = await http.get(Uri.parse('$baseurl/auth/find/oussama'),
+  //       headers: {
+  //         HttpHeaders.contentTypeHeader: 'application/json',
+  //         HttpHeaders.acceptHeader: 'application/json',
+  //         HttpHeaders.authorizationHeader: 'Bearer $token'
+  //       }
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     User user = User.fromJson(jsonDecode(response.body));
+  //     return user;
+  //   } else {
+  //     // Handle error cases here if needed.
+  //     throw Exception('Failed to fetch user info');
+  //   }
+  // }
 
-    http.Response response = await http.post(Uri.parse(uri),
+  // cmd
+  Future<List<Cmd>> fetchCommands() async {
+    showSpinner = true;
+    http.Response response = await http.get(Uri.parse('$baseurl/commandes'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        });
+    List commandes = jsonDecode(response.body);
+    showSpinner = false;
+    return commandes.map((commande) => Cmd.fromJson(commande)).toList();
+  }
+
+
+  Future<Cmd> updateCommande(Cmd cmd) async{
+    String uri = '$baseurl/commandes/${cmd.bcc_nupi}';
+    http.Response response = await http.put(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
         },
         body: jsonEncode({
-          'username': username,
-          'password': password,
-          'device_name': deviceName,
+          'bcc_val' : 1,
+        })
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update Commande !');
+    }
+    return Cmd.fromJson(jsonDecode(response.body));
+  }
+
+  // lcmd
+
+  Future<LCmd> updateLignCmd(LCmd ligne) async {
+    String uri = '$baseurl/ligne-commandes/${ligne.a_bcc_num}';
+
+    http.Response response = await http.put(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token'
+        },
+        body: jsonEncode({
+          'a_bcc_quch1': ligne.a_bcc_quch1,
+          'a_bcc_boch1': ligne.a_bcc_boch1,
+          'a_bcc_obs1': ligne.a_bcc_obs1,
+          'a_bcc_quch2': ligne.a_bcc_quch2,
+          'a_bcc_boch2': ligne.a_bcc_boch2,
+          'a_bcc_obs2': ligne.a_bcc_obs2,
         }));
 
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update');
+    }
+    return LCmd.fromJson(jsonDecode(response.body));
+  }
+
+
+  Future<List<LCmd>> fetchLigneC(String numpiece) async {
+    http.Response response = await http.post(Uri.parse('$baseurl/ligne-commandes/search'),
+            headers: {
+              HttpHeaders.contentTypeHeader: 'application/json', //important
+              HttpHeaders.acceptHeader: 'application/json',
+              HttpHeaders.authorizationHeader: 'Bearer $token'
+            },
+            body: jsonEncode({
+              'a_bcc_nupi': numpiece,
+            })
+        );
+    print(numpiece);
+    print(response.statusCode);
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      List ligneCmd = jsonDecode(response.body);
+      if(ligneCmd.isEmpty){
+        return [];
+      }
+      return ligneCmd.map((ligneC) => LCmd.fromJson(ligneC)).toList();
     } else {
-      Map<String, dynamic> body = jsonDecode(response.body);
-      Map<String, dynamic> errors = body['errors'];
-      String errorMessage = '';
-      errors.forEach((key, value) {
-        value.forEach((element) {
-          errorMessage += element + '\n';
-        });
-      });
+      String errorMessage = 'no data found';
       throw Exception(errorMessage);
     }
+  }
+
+
+  // image
+
+  Future<List<String>> getImagesUrl(String numpiece, String numero) async {
+    http.Response response =
+    await http.get(Uri.parse('$baseurl/file/check/$numpiece/$numero'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token'
+    });
+    List imageUrls = jsonDecode(response.body);
+
+    return imageUrls.map((element) => element.toString()).toList();
   }
 
   Future<http.StreamedResponse> uploadImage(File file, String numpiece,String numero, String fileName) async {
@@ -203,6 +217,30 @@ class ApiService {
     request.files.add(http.MultipartFile(
         'file', file.readAsBytes().asStream(), file.lengthSync(),
         filename: file.path.split('/').last));
+
+    http.StreamedResponse response = await request.send();
+    print('inside uploadImage ApiService');
+    return response;
+  }
+
+  Future<http.StreamedResponse> uploadImage2(File file, String numpiece,String numero, String fileName) async {
+    String url = '$baseurl/file/upload';
+    http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
+
+    request.headers.addAll(<String, String>{
+      HttpHeaders.contentTypeHeader: 'multipart/form-data',
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer ${token}'
+    });
+
+    request.fields.addAll(<String, String>{
+      'numero': numero,
+      'fileName': fileName,
+      'numpiece': numpiece,
+    });
+
+    request.files.add(await http.MultipartFile.fromPath(
+        'file', file.path));
 
     http.StreamedResponse response = await request.send();
     print('inside uploadImage ApiService');
