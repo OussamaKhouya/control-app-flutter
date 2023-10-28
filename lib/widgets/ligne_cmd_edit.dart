@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/models/constants.dart';
@@ -24,6 +26,9 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
   final ligneCmdObservation1Controller = TextEditingController();
   final ligneCmdObservation2Controller = TextEditingController();
 
+  final lcBoite1Controller = TextEditingController();
+  final lcBoite2Controller = TextEditingController();
+
   String errorMessage = '';
 
   @override
@@ -32,6 +37,8 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
     ligneCmdQuantite2Controller.text = widget.ligneC.a_bcc_quch2;
     ligneCmdObservation1Controller.text = widget.ligneC.a_bcc_obs1;
     ligneCmdObservation2Controller.text = widget.ligneC.a_bcc_obs2;
+    lcBoite1Controller.text = widget.ligneC.a_bcc_boch1;
+    lcBoite2Controller.text = widget.ligneC.a_bcc_boch2;
 
     super.initState();
   }
@@ -74,6 +81,26 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                         color: Colors.blue),
                   ),
                   const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Boites : ${widget.ligneC.a_bcc_boi}",
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Coefficient : ${widget.ligneC.a_bcc_coe}",
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                  const SizedBox(
                     height: 17,
                   ),
                   Visibility(
@@ -101,7 +128,51 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                             return 'Format de la quantité invalide';
                           }
                         },
-                        onChanged: (text) => setState(() => errorMessage = ''),
+                        onChanged: (text){
+                          setState(() {
+                            errorMessage = '';
+                          });
+                          if(text.isEmpty) text = '0';
+                          lcBoite1Controller.text = (double.parse(text) ~/ double.parse(widget.ligneC.a_bcc_coe)).toString();
+
+                          },
+                      )),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Visibility(
+                      visible: SHOW_TXT_Q1,
+                      child: TextFormField(
+                        readOnly: !ENABLE_TXT_Q1,
+                        controller: lcBoite1Controller,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Boites Chargées 1:',
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^-?(\d+\.?\d{0,4})?')),
+                        ],
+                        keyboardType: TextInputType.numberWithOptions(
+                            signed: true, decimal: true),
+                        validator: (value) {
+                          if (value!.trim().isEmpty) {
+                            return 'La N boites est requis';
+                          }
+                          final newValue = double.tryParse(value);
+
+                          if (newValue == null) {
+                            return 'Format de N boites invalide';
+                          }
+                        },
+                        onChanged: (text){
+                          setState(() {
+                            errorMessage = '';
+                          });
+                          if(text.isEmpty) text = '0';
+                          ligneCmdQuantite1Controller.text = (double.parse(text) * double.parse(widget.ligneC.a_bcc_coe)).toString();
+
+                        },
                       )),
                   const SizedBox(
                     height: 15,
@@ -149,8 +220,52 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
                             return 'Format de la quantité invalide';
                           }
                         },
-                        onChanged: (text) => setState(() => errorMessage = ''),
+                          onChanged: (text){
+                            setState(() {
+                              errorMessage = '';
+                            });
+                            if(text.isEmpty) text = '0';
+                            lcBoite2Controller.text = (double.parse(text) ~/ double.parse(widget.ligneC.a_bcc_coe)).toString();
 
+                          },
+
+                      )),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Visibility(
+                      visible: SHOW_TXT_Q2,
+                      child: TextFormField(
+                        readOnly: !ENABLE_TXT_Q2,
+                        controller: lcBoite2Controller,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Boites Chargées 2:',
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^-?(\d+\.?\d{0,4})?')),
+                        ],
+                        keyboardType: TextInputType.numberWithOptions(
+                            signed: true, decimal: true),
+                        validator: (value) {
+                          if (value!.trim().isEmpty) {
+                            return 'La N boites est requis';
+                          }
+                          final newValue = double.tryParse(value);
+
+                          if (newValue == null) {
+                            return 'Format de N boites invalide';
+                          }
+                        },
+                        onChanged: (text){
+                          setState(() {
+                            errorMessage = '';
+                          });
+                          if(text.isEmpty) text = '0';
+                          ligneCmdQuantite2Controller.text = (double.parse(text) * double.parse(widget.ligneC.a_bcc_coe)).toString();
+
+                        },
                       )),
                   const SizedBox(
                     height: 15,
@@ -223,6 +338,8 @@ class _LigneCmdEditState extends State<LigneCmdEdit> {
     widget.ligneC.a_bcc_quch2 = ligneCmdQuantite2Controller.text;
     widget.ligneC.a_bcc_obs1 = ligneCmdObservation1Controller.text;
     widget.ligneC.a_bcc_obs2 = ligneCmdObservation2Controller.text;
+    widget.ligneC.a_bcc_boch1 = lcBoite1Controller.text;
+    widget.ligneC.a_bcc_boch2 = lcBoite2Controller.text;
     widget
         .ligneCCallback(widget.ligneC)
         .then((category) => Navigator.pop(context))

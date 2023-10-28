@@ -14,6 +14,8 @@ class LCmd {
   String a_bcc_obs2;
   String nph1;
   String nph2;
+  String phc;
+  String phb;
 
 
   LCmd({
@@ -32,6 +34,8 @@ class LCmd {
     required this.a_bcc_obs2,
     required this.nph1,
     required this.nph2,
+    required this.phc,
+    required this.phb,
   });
 
   factory LCmd.fromJson(Map<String, dynamic> json) {
@@ -51,6 +55,8 @@ class LCmd {
       a_bcc_obs2 : (json['a_bcc_obs2'] != null) ? json['a_bcc_obs2'].toString():'',
       nph1 : (json['nph1'] != null) ? json['nph1'].toString():'',
       nph2 : (json['nph2'] != null) ? json['nph2'].toString():'',
+      phc : (json['phc'] != null) ? json['phc'].toString():'',
+      phb : (json['phb'] != null) ? json['phb'].toString():'',
     );
   }
 

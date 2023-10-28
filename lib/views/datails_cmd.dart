@@ -58,7 +58,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
-                  height: 35,
+                  height: 16,
                 ),
                 Row(
                   children: [
@@ -88,10 +88,8 @@ class _DetailsCmdState extends State<DetailsCmd> {
                       padding: const EdgeInsets.only(top: 5.0),
                       child: Material(
                           borderRadius: BorderRadius.circular(4.0),
-                          // Adjust the border radius as needed
                           color: Colors.blue,
                           elevation: 1.0,
-                          // Add elevation for a button-like appearance
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
                             // Add space around the icon

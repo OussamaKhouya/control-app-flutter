@@ -123,7 +123,8 @@ class ApiService {
           HttpHeaders.authorizationHeader: 'Bearer $token'
         },
         body: jsonEncode({
-          'bcc_val' : 1,
+          'bcc_val' : cmd.bcc_val,
+          'bcc_eta' : cmd.bcc_eta,
         })
     );
     if (response.statusCode != 200) {
@@ -157,6 +158,7 @@ class ApiService {
     }
     return LCmd.fromJson(jsonDecode(response.body));
   }
+
 
 
   Future<List<LCmd>> fetchLigneC(String numpiece) async {
@@ -223,7 +225,7 @@ class ApiService {
     return response;
   }
 
-  Future<http.StreamedResponse> uploadImage2(File file, String numpiece,String numero, String fileName) async {
+  Future<http.StreamedResponse> uploadImage2(File file, String numpiece,String numero, String fileName, String type) async {
     String url = '$baseurl/file/upload';
     http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
 
@@ -237,6 +239,7 @@ class ApiService {
       'numero': numero,
       'fileName': fileName,
       'numpiece': numpiece,
+      'type': type
     });
 
     request.files.add(await http.MultipartFile.fromPath(
@@ -245,5 +248,26 @@ class ApiService {
     http.StreamedResponse response = await request.send();
     print('inside uploadImage ApiService');
     return response;
+  }
+
+  removeImage(String nupi, String num, String imageName) async {
+    http.Response response = await http.delete(Uri.parse('$baseurl/file/$nupi/$num/$imageName'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token'
+    });
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body  = jsonDecode(response.body);
+      String message = body['message'];
+      print(message);
+    } else {
+      Map<String, dynamic> body = jsonDecode(response.body);
+      String errorMessage = body['message'];
+      print(errorMessage);
+      throw Exception(errorMessage);
+    }
+
+
+
   }
 }

@@ -158,11 +158,13 @@ class _HomePageState extends State<Commands> {
                                           final provider0 = Provider.of<LCmdProvider>(context, listen: false);
                                           provider0.fetchLigneC(cmd.bcc_nupi);
                                           var refresh = await Navigator.pushNamed(context, '/detailsCmd', arguments: cmd.bcc_nupi);
+                                          updateCmdStatus(cmd, provider);
                                           if(refresh == true || refresh == null){
                                             onlyOnce=true;
                                             getCmd(provider, true);
                                             inputSearch.clear();
                                             //_runFilter('');
+
                                             setState(() {
                                               _foundCommands = commands;
                                             }
@@ -302,7 +304,7 @@ class _HomePageState extends State<Commands> {
             style: TextStyle(color: Colors.black54),
           ),
           content: Text(
-            "Voulez-vous vraiment verrouiller la commande : ${cmd.bcc_nupi} ?",
+            "Voulez-vous vraiment valider la commande : ${cmd.bcc_nupi} ?",
             style: const TextStyle(
               color: Colors.blue,
               fontWeight: FontWeight.bold,
@@ -311,7 +313,7 @@ class _HomePageState extends State<Commands> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                provider.updateCommande(cmd);
+                updateCmdValid(cmd, provider);
                 setState(() {
                   onlyOnce=true;
                   getCmd(provider, true);
@@ -331,5 +333,15 @@ class _HomePageState extends State<Commands> {
         );
       },
     );
+  }
+
+  void updateCmdStatus(Cmd cmd, CmdProvider provider) {
+    cmd.bcc_val = true;
+    provider.updateCommande(cmd);
+  }
+
+  void updateCmdValid(Cmd cmd, CmdProvider provider) {
+    cmd.bcc_eta = StatusConstants.EN_PREPARATION;
+    provider.updateCommande(cmd);
   }
 }

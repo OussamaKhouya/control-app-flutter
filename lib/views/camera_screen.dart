@@ -12,8 +12,6 @@ import 'package:galleryimage/galleryimage.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-import '../models/user.dart';
-
 class CameraScreen extends StatefulWidget {
   CameraScreen({super.key});
 
@@ -22,27 +20,62 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late int imageCount;
+  int imageCount = 0;
+  int camionImageCount = 0;
+  int bonImageCount = 0;
   late Future<List<String>> listOfUrls;
   bool imageSelected = false;
   late LCmd ligneC;
 
-  bool onlyOnce = true;
+  bool runLoadGallery = true;
   bool onlyOncePhotos = true;
+  List<String> filtredList = [];
 
   String? UPLOAD_IMG_INITIALS;
+
 
   @override
   void initState() {
     super.initState();
   }
 
+  bool showMyDialog = false;
+
+  showSpinnerDialog(BuildContext context) {
+    if (showMyDialog) {
+      print("showSpinnerDialog");
+      AlertDialog alert = AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            Container(
+                margin: EdgeInsets.only(left: 5),
+                child: Text(" Envoyer ", style: TextStyle(color: Colors.blue))),
+          ],
+        ),
+      );
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+      showMyDialog = false;
+    }
+  }
+
+  closeSpinnerDialog() {
+    print("CloseSpinnerDialog");
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     ligneC = ModalRoute.of(context)?.settings.arguments as LCmd;
 
-    final AuthProvider provider = Provider.of<AuthProvider>(context, listen: false);
+    final AuthProvider provider =
+        Provider.of<AuthProvider>(context, listen: false);
     Get.lazyPut(() => ImageController(provider));
     loadGallery();
 
@@ -167,12 +200,33 @@ class _CameraScreenState extends State<CameraScreen> {
                             child: ElevatedButton(
                                 child: Row(
                                   children: <Widget>[
-                                    const Icon(Icons.cloud_upload, size: 20),
-                                    Text(' upload ($imageCount)'),
+                                    const Icon(Icons.image, size: 20),
+                                    Text(' ($imageCount)'),
                                   ],
                                 ),
-                                onPressed: () =>
-                                    onUploadImage(imageController))),
+                                onPressed: () => uploadImage(imageController,'article'))),
+                        const SizedBox(width: 20),
+                        Visibility(
+                            visible: true,
+                            child: ElevatedButton(
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.inventory_outlined, size: 20),
+                                    Text(' ($bonImageCount)'),
+                                  ],
+                                ),
+                                onPressed: () => uploadImage(imageController,'bon'))),
+                        const SizedBox(width: 20),
+                        Visibility(
+                            visible: true,
+                            child: ElevatedButton(
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.fire_truck_outlined, size: 20),
+                                    Text(' ($camionImageCount)'),
+                                  ],
+                                ),
+                                onPressed: () => uploadImage(imageController,'camion')))
                       ],
                     )
                   : const SizedBox(
@@ -195,24 +249,123 @@ class _CameraScreenState extends State<CameraScreen> {
                     case ConnectionState.done:
                       if (snapshot.hasData) {
                         List<String> nonNullableList = snapshot.data ?? [];
-                        List<String> filtredList = nonNullableList.where((url) => url.contains(UPLOAD_IMG_INITIALS.toString())).toList();
+                        filtredList = [];
+                        if(nonNullableList.isNotEmpty){
+                          filtredList = nonNullableList
+                              .where((url) =>
+                              url.contains(UPLOAD_IMG_INITIALS.toString()) ||
+                                  url.contains('camion') ||
+                                  url.contains('bon'))
+                              .toList();
+                        }
+                        imageCount = filtredList.where((url) => url.contains(UPLOAD_IMG_INITIALS.toString())).toList().length;
+                        camionImageCount = filtredList.where((url) => url.contains('camion')).toList().length;
+                        bonImageCount = filtredList.where((url) => url.contains('bon')).toList().length;
+
+                        bool showTrash1 = imageCount != 0;
+                        bool showTrash2 = imageCount >= 2;
+                        bool showCamion = camionImageCount >= 1;
+                        bool showBon = bonImageCount >= 1;
                         return (nonNullableList.isNotEmpty)
                             ? Column(
                                 children: [
                                   Padding(
                                       padding: const EdgeInsets.only(
                                           left: 20, right: 20),
-                                      child: Container(
-                                        width: 500,
-                                        alignment: Alignment.center,
-                                        child: GalleryImage(
-                                            imageUrls: filtredList,
-                                            numOfShowImages:
-                                                (filtredList.length)),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: 500,
+                                            alignment: Alignment.center,
+                                            child: GalleryImage(
+                                              imageUrls: filtredList,
+                                              numOfShowImages:
+                                                  filtredList.length,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          const Divider(
+                                            color: Colors.blue,
+                                            thickness: 5,
+                                          ),
+                                          Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Visibility(
+                                                  visible: showTrash1,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete),
+                                                      IconButton(
+                                                        icon: Icon(
+                                                            Icons.looks_one),
+                                                        color: Colors.red,
+                                                        onPressed: () =>
+                                                            removeImage('${UPLOAD_IMG_INITIALS}_1',
+                                                                imageController),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                  visible: showTrash2,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete),
+                                                      IconButton(
+                                                        icon: Icon(
+                                                            Icons.looks_two),
+                                                        color: Colors.red,
+                                                        onPressed: () =>
+                                                            removeImage('${UPLOAD_IMG_INITIALS}_2',
+                                                                imageController),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                  visible: showCamion,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete),
+                                                      IconButton(
+                                                        icon: Icon(
+                                                            Icons.fire_truck_outlined),
+                                                        color: Colors.red,
+                                                        onPressed: () =>
+                                                            removeImage('camion',
+                                                                imageController),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                  visible: showBon,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete),
+                                                      IconButton(
+                                                        icon: Icon(
+                                                            Icons.inventory_outlined),
+                                                        color: Colors.red,
+                                                        onPressed: () =>
+                                                            removeImage('bon',
+                                                                imageController),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       )),
                                 ],
                               )
-                            : const Text("Pas d'images pour cet article");
+                            : const Text("Pas d'images par cet article");
                       } else if (snapshot.hasError) {
                         return const Text('Something went wrong!');
                       }
@@ -222,7 +375,6 @@ class _CameraScreenState extends State<CameraScreen> {
                   return Text("default");
                 },
               ),
-              const SizedBox(height: 10),
             ],
           )),
         )),
@@ -231,11 +383,27 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   loadGallery() {
-    if (onlyOnce) {
-      final ligneCmdprovider = Provider.of<LCmdProvider>(context, listen: false);
+    if (runLoadGallery) {
+      final ligneCmdprovider =
+          Provider.of<LCmdProvider>(context, listen: false);
       setState(() {
         listOfUrls = ligneCmdprovider.getImagesUrl(ligneC.a_bcc_nupi, ligneC.a_bcc_num);
-        onlyOnce = false;
+        listOfUrls.then((list){
+            filtredList = [];
+            if(list.isNotEmpty){
+          filtredList = list
+              .where((url) =>
+          url.contains(UPLOAD_IMG_INITIALS.toString()) ||
+              url.contains('camion') ||
+              url.contains('bon'))
+              .toList();
+        }
+        imageCount = filtredList.where((url) => url.contains(UPLOAD_IMG_INITIALS.toString())).toList().length;
+        camionImageCount = filtredList.where((url) => url.contains('camion')).toList().length;
+        bonImageCount = filtredList.where((url) => url.contains('bon')).toList().length;
+
+      });
+        runLoadGallery = false;
       });
     }
   }
@@ -253,70 +421,80 @@ class _CameraScreenState extends State<CameraScreen> {
     SHOW_BTN_SAVE = permissions[PermConstants.SHOW_BTN_SAVE]!;
     UPLOAD_IMG_INITIALS = permissions[PermConstants.UPLOAD_IMG_INITIALS]!;
 
-    if(onlyOncePhotos){
-      if(UPLOAD_IMG_INITIALS == "c1"){
+    if (onlyOncePhotos) {
+      if (UPLOAD_IMG_INITIALS == "c1") {
         imageCount = int.parse(ligneC.nph1);
-      }else if(UPLOAD_IMG_INITIALS == "c2"){
+      } else if (UPLOAD_IMG_INITIALS == "c2") {
         imageCount = int.parse(ligneC.nph2);
-      }else {
+      } else {
         imageCount = int.parse(ligneC.nph1) + int.parse(ligneC.nph2);
       }
+      bonImageCount = int.parse(ligneC.phb);
+      camionImageCount = int.parse(ligneC.phc);
 
       onlyOncePhotos = false;
     }
   }
 
-  onUploadImage(ImageController imageController) async {
-      if (imageCount < 2) {
-        String path = await imageController.saveImage();
-        if(path.isNotEmpty){
-          imageController
-              .uploadImage(ligneC.a_bcc_nupi, ligneC.a_bcc_num, '${UPLOAD_IMG_INITIALS}_${imageCount + 1}',
-              File(path))
-              .then((value) => {
-            if (value)
-              {
-                setState(() {
-                  imageCount++;
-                  onlyOnce = true;
-                  loadGallery();
-                  imageController.image = null;
-                })
-              }
-          });
-        }else {
-          return Fluttertoast.showToast(
-            msg: "prend une photo!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            textColor: Color(0xFFfa6467),
-            backgroundColor: Color(0xFFfde8e7),
-            fontSize: 16.0,
-          );
-        }
+  onUploadImage(ImageController imageController,String type) async {
+      String path = await imageController.saveImage();
+      if (path.isNotEmpty) {
+        setState(() {
+          imageCount = filtredList.length;
 
+        });
+        imageController.uploadImage(ligneC.a_bcc_nupi, ligneC.a_bcc_num,
+                '${UPLOAD_IMG_INITIALS}_${imageCount + 1}', File(path),type)
+            .then((value) => {
+                  if (value)
+                    {
+                      setState(() {
+                        runLoadGallery = true;
+                        imageController.image = null;
+                      })
+                    }
+                });
       } else {
         return Fluttertoast.showToast(
-          msg: "2 images est le maximum!",
-          toastLength: Toast.LENGTH_LONG,
+          msg: "prend une photo!",
+          toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           textColor: Color(0xFFfa6467),
           backgroundColor: Color(0xFFfde8e7),
           fontSize: 16.0,
         );
       }
-
   }
-
   onPickImage(ImageController imageController) {
-    if (imageCount < 2) {
       imageController.pickImageCamera();
       setState(() {
         imageSelected = true;
+        imageCount = filtredList.where((url) => url.contains(UPLOAD_IMG_INITIALS.toString())).toList().length;
+        camionImageCount = filtredList.where((url) => url.contains('camion')).toList().length;
+        bonImageCount = filtredList.where((url) => url.contains('bon')).toList().length;
       });
+  }
+
+  uploadImage(ImageController imageController, String type) {
+    bool canUplaod = true;
+    String errorMsg = 'type introuvable: $type';
+    if(type == 'article'){
+      canUplaod = imageCount < 2;
+      errorMsg = '2 images pour article est le maximum!';
+    }else if(type == 'camion'){
+      canUplaod = camionImageCount == 0;
+      errorMsg = 'image camion est déja prit';
+    }else if(type == 'bon'){
+      canUplaod = bonImageCount == 0;
+      errorMsg = 'image bon est déja prit';
+    }
+    if (canUplaod) {
+    // showSpinnerDialog(context);
+    onUploadImage(imageController, type);
+    // closeSpinnerDialog();
     } else {
       return Fluttertoast.showToast(
-        msg: "2 images est le maximum!",
+        msg: errorMsg,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         textColor: const Color(0xFFfa6467),
@@ -324,5 +502,20 @@ class _CameraScreenState extends State<CameraScreen> {
         fontSize: 16.0,
       );
     }
+  }
+
+  removeImage(String imgName, ImageController imageController) {
+    setState(() {
+      showMyDialog = true;
+      imageCount = filtredList.length;
+      showSpinnerDialog(context);
+    });
+
+    imageController.removeImage(ligneC.a_bcc_nupi, ligneC.a_bcc_num, imgName);
+    closeSpinnerDialog();
+    setState(() {
+      runLoadGallery = true;
+      imageCount = filtredList.length;
+    });
   }
 }

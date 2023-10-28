@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
@@ -8,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class ImageController extends GetxController {
 
@@ -69,13 +71,13 @@ class ImageController extends GetxController {
     }
   }
 
-  Future<bool> uploadImage(String numpiece,String numero, String fileName,File file) async {
+  Future<bool> uploadImage(String numpiece,String numero, String fileName,File file, String type) async {
     if(file != null){
       var len = await file.length();
-      print("len");
-      print(len);
       if(len != 0){
-        http.StreamedResponse response = await apiService.uploadImage2(file, numpiece,numero, fileName);
+
+        File compressedFile = await compressImage(file);
+        http.StreamedResponse response = await apiService.uploadImage2(compressedFile, numpiece,numero, fileName, type);
         print(response.statusCode);
         if (response.statusCode == 201) {
           Map map = jsonDecode(await response.stream.bytesToString());
@@ -104,5 +106,67 @@ class ImageController extends GetxController {
     return false;
 
   }
+
+  void removeImage(String a_bcc_nupi, String a_bcc_num, String imgName)  {
+      apiService.removeImage(a_bcc_nupi, a_bcc_num,'$imgName.jpg');
+  }
+
+  Future<File> compressImage0(File file) async {
+    int goalSizeKB =  512;
+    int originalSizeKB = file.lengthSync() ~/ 1024;
+
+    if (originalSizeKB <= goalSizeKB) {
+      return file; // No need to compress if already within goal size
+    }
+
+    int quality = ((goalSizeKB / originalSizeKB) * 100).toInt();
+    if (quality < 10) quality = 10; // Set a minimum quality threshold
+
+    print("quality = $quality");
+    var result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      quality: 60,
+      format: CompressFormat.jpeg
+    );
+
+    print('File size before compression: ${file.lengthSync()}');
+    print('File size after compression: ${result?.length}');
+    print('File quality: ${((file.lengthSync() / result!.length)).toInt()}');
+
+    File compressedFile = File(file.path.replaceAll('.jpg', '_compressed.jpg'));
+    await compressedFile.writeAsBytes(result as Uint8List);
+
+    return compressedFile;
+  }
+
+
+  Future<File> compressImage(File file) async {
+
+    int goalSizeKB =  512;
+    int minQuality = 10;
+    int maxQuality = 100;
+    int quality = 80; // Initial guess
+
+    while (minQuality <= maxQuality) {
+      List<int> compressedImageBytes = (await FlutterImageCompress.compressWithFile(
+        file.path,
+        quality: quality,
+        format: CompressFormat.jpeg
+      )) as List<int>;
+
+      int fileSizeKB = compressedImageBytes.length ~/ 1024;
+
+      if (fileSizeKB < goalSizeKB) {
+        return File(file.path.replaceFirst('.jpg', '_compressed.jpg'))..writeAsBytesSync(compressedImageBytes);
+      }
+
+      maxQuality = quality - 1;
+      quality = ((minQuality + maxQuality) / 2).toInt();
+
+    }
+
+    return file;
+  }
+
 
 }

@@ -16,6 +16,14 @@ class RoleConstants {
   static const String admin = 'ADMIN';
 }
 
+class StatusConstants {
+  static const String INITIAL = 'INITIAL';
+  static const String EN_PREPARATION = 'EN PREPARATION';
+  static const String TERMINE = 'TERMINE';
+  static const String ANNULE = 'ANNULE';
+  static const String LIVREE = 'LIVREE';
+}
+
 class PermConstants {
   static const String SHOW_TXT_Q1 = "SHOW_TXT_Q1";
   static const String SHOW_TXT_Q2 = "SHOW_TXT_Q2";
