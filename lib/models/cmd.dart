@@ -53,4 +53,9 @@ class Cmd {
       bcc_usr_sup: json['bcc_usr_sup'],
     );
   }
+
+  @override
+  String toString() {
+    return 'Cmd{bcc_nupi: $bcc_nupi, bcc_dat: $bcc_dat, bcc_dach1: $bcc_dach1, bcc_dach2: $bcc_dach2, bcc_lcli: $bcc_lcli, bcc_lrep: $bcc_lrep, bcc_lexp: $bcc_lexp, bcc_veh: $bcc_veh, bcc_eta: $bcc_eta, bcc_val: $bcc_val, bcc_usr_sai: $bcc_usr_sai, bcc_usr_com: $bcc_usr_com, bcc_usr_con1: $bcc_usr_con1, bcc_usr_con2: $bcc_usr_con2, bcc_usr_sup: $bcc_usr_sup}';
+  }
 }

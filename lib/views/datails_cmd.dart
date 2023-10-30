@@ -16,11 +16,12 @@ class DetailsCmd extends StatefulWidget {
 }
 
 class _DetailsCmdState extends State<DetailsCmd> {
-  List<LCmd> LigneCommands = [];
+  List<LCmd> ligneCommands = [];
   String numpiece = '';
   final inputSearch = TextEditingController();
   String? UPLOAD_IMG_INITIALS;
   int imageCount = 0;
+  String phc = "0", phb = "0";
 
   // This list holds the data for the list view
   List<LCmd> _foundLigneCmd = [];
@@ -49,10 +50,10 @@ class _DetailsCmdState extends State<DetailsCmd> {
             child: Column(
               children: [
                 const SizedBox(
-                  height: 35,
+                  height: 20,
                 ),
                 Text(
-                  "${LigneCommands.length} articles dans: $numpiece",
+                  "${ligneCommands.length} articles dans: $numpiece \n\n camion $phc  bon $phb",
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
@@ -60,6 +61,7 @@ class _DetailsCmdState extends State<DetailsCmd> {
                 const SizedBox(
                   height: 16,
                 ),
+
                 Row(
                   children: [
                     const SizedBox(
@@ -215,9 +217,18 @@ class _DetailsCmdState extends State<DetailsCmd> {
                                             size: 30,
                                           ),
                                           onTap: () async {
-                                            Navigator.pushNamed(
-                                                context, '/camera',
-                                                arguments: lignC);
+                                            var refresh = await Navigator.pushNamed(context, '/camera', arguments: lignC);
+                                            if(refresh == true || refresh == null){
+                                              onlyOnce=true;
+                                              getLignCmd(provider, true);
+                                              inputSearch.clear();
+                                              //_runFilter('');
+
+                                              setState(() {
+                                                _foundLigneCmd = ligneCommands;
+                                              }
+                                              );
+                                            }
                                           },
                                         ),
                                       ),
@@ -290,21 +301,25 @@ class _DetailsCmdState extends State<DetailsCmd> {
       if (dbCall) {
         showSpinner = true;
         showSpinnerDialog(context);
-        LigneCommands = await provider.fetchLigneC(numpiece);
+        ligneCommands = await provider.fetchLigneC(numpiece);
+        if(ligneCommands.isNotEmpty){
+          phc = ligneCommands[0].phc;
+          phb = ligneCommands[0].phb;
+        }
         closeSpinnerDialog();
         showSpinner = false;
       }
-      LigneCommands = provider.ligne_commands;
-      _foundLigneCmd = LigneCommands;
+      ligneCommands = provider.ligne_commands;
+      _foundLigneCmd = ligneCommands;
     }
   }
 
   void _runFilter(String enteredKeyword) {
     List<LCmd> results = [];
     if (enteredKeyword.isEmpty) {
-      results = LigneCommands;
+      results = ligneCommands;
     } else {
-      results = LigneCommands.where((ligneC) => ligneC.a_bcc_lib
+      results = ligneCommands.where((ligneC) => ligneC.a_bcc_lib
           .toLowerCase()
           .contains(enteredKeyword.toLowerCase())).toList();
     }

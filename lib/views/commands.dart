@@ -98,14 +98,14 @@ class _HomePageState extends State<Commands> {
                         borderRadius: BorderRadius.circular(10.0),
                         ),
                         key: ValueKey(cmd.bcc_nupi),
-                        color: (!cmd.bcc_val)? Colors.blue : Colors.grey.shade500,
+                        color: (!cmd.bcc_val)? (cmd.bcc_eta == StatusConstants.EN_PREPARATION) ? Colors.green : Colors.blue : Colors.grey.shade500,
                         elevation: 4,
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         child: Column(
                           children: [
                             ListTile(
                               leading: Text(
-                                cmd.bcc_nupi.toString(),
+                                "${cmd.bcc_nupi.toString()}",
                                 style: const TextStyle(fontSize: 16,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
@@ -116,7 +116,7 @@ class _HomePageState extends State<Commands> {
                                   )
                               ),
                               subtitle: Text(
-                                  cmd.bcc_dat, style: const TextStyle(
+                                  "${cmd.bcc_dat} \n ${cmd.bcc_eta.toLowerCase()}", style: const TextStyle(
                                   color: Colors.white, fontWeight: FontWeight.bold
                               )
                               ),
@@ -157,13 +157,12 @@ class _HomePageState extends State<Commands> {
                                         onTap: () async {
                                           final provider0 = Provider.of<LCmdProvider>(context, listen: false);
                                           provider0.fetchLigneC(cmd.bcc_nupi);
+                                          updateCmdStatus(cmd, provider, false, StatusConstants.EN_PREPARATION);
                                           var refresh = await Navigator.pushNamed(context, '/detailsCmd', arguments: cmd.bcc_nupi);
-                                          updateCmdStatus(cmd, provider);
                                           if(refresh == true || refresh == null){
                                             onlyOnce=true;
                                             getCmd(provider, true);
                                             inputSearch.clear();
-                                            //_runFilter('');
 
                                             setState(() {
                                               _foundCommands = commands;
@@ -313,7 +312,7 @@ class _HomePageState extends State<Commands> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                updateCmdValid(cmd, provider);
+                updateCmdStatus(cmd, provider, true, StatusConstants.TERMINE);
                 setState(() {
                   onlyOnce=true;
                   getCmd(provider, true);
@@ -335,13 +334,10 @@ class _HomePageState extends State<Commands> {
     );
   }
 
-  void updateCmdStatus(Cmd cmd, CmdProvider provider) {
-    cmd.bcc_val = true;
+  void updateCmdStatus(Cmd cmd, CmdProvider provider,bool val, String status) {
+    cmd.bcc_val = val;
+    cmd.bcc_eta = status;
     provider.updateCommande(cmd);
   }
 
-  void updateCmdValid(Cmd cmd, CmdProvider provider) {
-    cmd.bcc_eta = StatusConstants.EN_PREPARATION;
-    provider.updateCommande(cmd);
-  }
 }

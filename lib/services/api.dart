@@ -130,6 +130,8 @@ class ApiService {
     if (response.statusCode != 200) {
       throw Exception('Error happened on update Commande !');
     }
+    print("updateCommande: ");
+    print(cmd.toString());
     return Cmd.fromJson(jsonDecode(response.body));
   }
 

@@ -36,14 +36,14 @@ class MyDrawer extends StatelessWidget {
                        ),
                        const SizedBox(height: 8), // Add some space between the image and text
                        Text(
-                         "${currUser.name}",
+                         currUser.name,
                          style: const TextStyle(
                            color: Colors.white,
                            fontSize: 18, // Adjust the font size as desired
                          ),
                        ),// Add some space between the image and text
                        Text(
-                         "${currUser.role.toLowerCase()}",
+                         currUser.role.toLowerCase(),
                          style: const TextStyle(
                            color: Colors.white,
                            fontSize: 18, // Adjust the font size as desired
