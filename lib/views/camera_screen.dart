@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/models/cmd.dart';
 import 'package:flutter_app/models/constants.dart';
 import 'package:flutter_app/models/lcmd.dart';
 import 'package:flutter_app/providers/auth_provider.dart';
+import 'package:flutter_app/providers/cmd_provider.dart';
 import 'package:flutter_app/providers/lcmd_provider.dart';
 import 'package:flutter_app/services/image_controller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -73,6 +75,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     ligneC = ModalRoute.of(context)?.settings.arguments as LCmd;
+    final cmdProvider = Provider.of<CmdProvider>(context);
 
     final AuthProvider provider =
         Provider.of<AuthProvider>(context, listen: false);
@@ -204,7 +207,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                     Text(' ($imageCount)'),
                                   ],
                                 ),
-                                onPressed: () => uploadImage(imageController,'article'))),
+                                onPressed: () => uploadImage(imageController,'article',cmdProvider))),
                         const SizedBox(width: 20),
                         Visibility(
                             visible: true,
@@ -215,7 +218,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                     Text(' ($bonImageCount)'),
                                   ],
                                 ),
-                                onPressed: () => uploadImage(imageController,'bon'))),
+                                onPressed: () => uploadImage(imageController,'bon',cmdProvider))),
                         const SizedBox(width: 20),
                         Visibility(
                             visible: true,
@@ -226,7 +229,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                     Text(' ($camionImageCount)'),
                                   ],
                                 ),
-                                onPressed: () => uploadImage(imageController,'camion')))
+                                onPressed: () => uploadImage(imageController,'camion',cmdProvider)))
                       ],
                     )
                   : const SizedBox(
@@ -475,7 +478,7 @@ class _CameraScreenState extends State<CameraScreen> {
       });
   }
 
-  uploadImage(ImageController imageController, String type) {
+  uploadImage(ImageController imageController, String type, CmdProvider cmdProvider) {
     bool canUplaod = true;
     String errorMsg = 'type introuvable: $type';
     if(type == 'article'){
@@ -491,6 +494,8 @@ class _CameraScreenState extends State<CameraScreen> {
     if (canUplaod) {
     // showSpinnerDialog(context);
     onUploadImage(imageController, type);
+
+    updateCmdStatus(ligneC.a_bcc_nupi, cmdProvider, false, StatusConstants.EN_PREPARATION);
     // closeSpinnerDialog();
     } else {
       return Fluttertoast.showToast(
@@ -502,6 +507,11 @@ class _CameraScreenState extends State<CameraScreen> {
         fontSize: 16.0,
       );
     }
+  }
+
+  void updateCmdStatus(String nupi, CmdProvider provider,bool val, String status) {
+    Cmd cmd = Cmd(bcc_nupi: nupi, bcc_val: val, bcc_eta: status);
+    provider.updateCommande(cmd);
   }
 
   removeImage(String imgName, ImageController imageController) {

@@ -1,37 +1,37 @@
 class Cmd {
   String bcc_nupi;
-  String bcc_dat;
-  String bcc_dach1;
-  String bcc_dach2;
-  String bcc_lcli;
-  String bcc_lrep;
-  String bcc_lexp;
-  String bcc_veh;
-  String bcc_eta;
+  String ?bcc_dat;
+  String ?bcc_dach1;
+  String ?bcc_dach2;
+  String ?bcc_lcli;
+  String ?bcc_lrep;
+  String ?bcc_lexp;
+  String ?bcc_veh;
+  String ?bcc_eta;
   bool bcc_val;
-  String bcc_usr_sai;
-  String bcc_usr_com;
-  String bcc_usr_con1;
-  String bcc_usr_con2;
-  String bcc_usr_sup;
+  String ?bcc_usr_sai;
+  String ?bcc_usr_com;
+  String ?bcc_usr_con1;
+  String ?bcc_usr_con2;
+  String ?bcc_usr_sup;
 
 
   Cmd({
     required this.bcc_nupi,
-    required this.bcc_dat,
-    required this.bcc_dach1,
-    required this.bcc_dach2,
-    required this.bcc_lcli,
-    required this.bcc_lrep,
-    required this.bcc_lexp,
-    required this.bcc_veh,
-    required this.bcc_eta,
-    required this.bcc_val,
-    required this.bcc_usr_sai,
-    required this.bcc_usr_com,
-    required this.bcc_usr_con1,
-    required this.bcc_usr_con2,
-    required this.bcc_usr_sup,
+     this.bcc_dat,
+     this.bcc_dach1,
+     this.bcc_dach2,
+     this.bcc_lcli,
+     this.bcc_lrep,
+     this.bcc_lexp,
+     this.bcc_veh,
+     this.bcc_eta,
+     this.bcc_val = false,
+     this.bcc_usr_sai,
+     this.bcc_usr_com,
+     this.bcc_usr_con1,
+     this.bcc_usr_con2,
+     this.bcc_usr_sup,
   });
 
   factory Cmd.fromJson(Map<String, dynamic> json) {

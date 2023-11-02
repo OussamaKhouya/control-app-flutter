@@ -110,13 +110,13 @@ class _HomePageState extends State<Commands> {
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
-                              title: Text(cmd.bcc_lcli,
+                              title: Text(cmd.bcc_lcli.toString(),
                                   style: const TextStyle(
                                       color: Colors.white, fontWeight: FontWeight.bold
                                   )
                               ),
                               subtitle: Text(
-                                  "${cmd.bcc_dat} \n ${cmd.bcc_eta.toLowerCase()}", style: const TextStyle(
+                                  "${cmd.bcc_dat} \n ${cmd.bcc_eta.toString().toLowerCase()}", style: const TextStyle(
                                   color: Colors.white, fontWeight: FontWeight.bold
                               )
                               ),
@@ -157,7 +157,6 @@ class _HomePageState extends State<Commands> {
                                         onTap: () async {
                                           final provider0 = Provider.of<LCmdProvider>(context, listen: false);
                                           provider0.fetchLigneC(cmd.bcc_nupi);
-                                          updateCmdStatus(cmd, provider, false, StatusConstants.EN_PREPARATION);
                                           var refresh = await Navigator.pushNamed(context, '/detailsCmd', arguments: cmd.bcc_nupi);
                                           if(refresh == true || refresh == null){
                                             onlyOnce=true;
@@ -254,7 +253,7 @@ class _HomePageState extends State<Commands> {
     } else {
       results = commands
           .where((command) =>
-          command.bcc_lcli.toLowerCase().contains(enteredKeyword.toLowerCase()) ||
+          command.bcc_lcli.toString().toLowerCase().contains(enteredKeyword.toLowerCase()) ||
               command.bcc_nupi.toLowerCase().contains(enteredKeyword.toLowerCase())
       ).toList();
     }
