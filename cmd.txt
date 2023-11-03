@@ -6,7 +6,7 @@ flutter clear
 flutter build web
 
 # deploy on android
-flutter clear
+flutter clean
 flutter build apk
 
 # fix  SocketException
